@@ -1,0 +1,1286 @@
+{
+  "@@locale": "es_MX",
+  "commonCancel": "Cancelar",
+  "commonSave": "Guardar",
+  "commonAccept": "Aceptar",
+  "commonDelete": "Eliminar",
+  "commonEdit": "Editar",
+  "commonClose": "Cerrar",
+  "commonSearch": "Buscar",
+  "commonSearchHint": "Buscar...",
+  "commonBack": "Atrás",
+  "commonNext": "Siguiente",
+  "commonConfirm": "Confirmar",
+  "commonRetry": "Reintentar",
+  "commonReset": "Restablecer",
+  "commonSeeMore": "Ver más",
+  "commonSeeAll": "Ver todo",
+  "commonLoading": "Cargando...",
+  "commonError": "Ocurrió un error",
+  "commonSuccess": "Listo",
+  "commonYes": "Sí",
+  "commonNo": "No",
+  "commonShare": "Compartir",
+  "commonReport": "Reportar",
+  "commonBlock": "Bloquear",
+  "commonFollow": "Seguir",
+  "commonUnfollow": "Dejar de seguir",
+  "commonSend": "Enviar",
+  "commonContinue": "Continuar",
+  "commonSkip": "Omitir",
+  "commonDone": "Listo",
+  "commonOptions": "Opciones",
+  "commonSettings": "Configuración",
+  "commonNoResultsTitle": "No se encontraron resultados",
+  "commonNoResultsSubtitle": "Intenta con otra búsqueda.",
+  "languageScreenTitle": "Idioma",
+  "languageScreenHeading": "Selecciona tu idioma",
+  "languageScreenSubtitle": "Elige el idioma en el que deseas utilizar Zentry.",
+  "languageScreenLanguagesStat": "Idiomas",
+  "languageScreenCoverageStat": "Cobertura",
+  "languageScreenCoverageValue": "Global",
+  "languageScreenSearchHint": "Buscar idioma...",
+  "languageScreenRecommended": "Recomendados",
+  "languageScreenAllLanguages": "Todos los idiomas",
+  "languageScreenEmptyTitle": "No se encontraron idiomas",
+  "languageScreenEmptySubtitle": "Intenta con otra búsqueda.",
+  "languageScreenReset": "Restablecer",
+  "languageScreenCurrent": "Idioma actual",
+  "languageScreenSpanishName": "Español (México)",
+  "languageScreenSpanishNative": "Español",
+  "languageScreenNahuatlName": "Náhuatl",
+  "languageScreenNahuatlNative": "Nāhuatl",
+  "authLoginWelcomeTitle": "Bienvenido a Zentry",
+  "authLoginEmailHint": "Email",
+  "authLoginPasswordHint": "Password",
+  "authLoginSubmitButton": "Iniciar sesión",
+  "authLoginNoAccountText": "¿No tienes cuenta? Regístrate",
+  "authLoginEmailValidationError": "Ingresa un correo válido",
+  "authLoginPasswordValidationError": "Ingresa tu contraseña",
+  "authLoginInvalidCredentialsError": "Correo o contraseña incorrectos",
+  "authLoginUseBiometricButton": "Usar huella",
+  "authLoginUsePasswordButton": "Usar contraseña",
+  "authLoginBiometricPrompt": "Confirma tu identidad con huella o rostro para continuar",
+  "authLoginBiometricFailedError": "No se pudo verificar tu huella, intenta de nuevo",
+  "authRegisterHeadline": "Configura tu perfil creativo",
+  "authRegisterSubheading": "Solo toma unos minutos comenzar.",
+  "authRegisterFullNameHint": "Nombre completo o artístico",
+  "authRegisterArtistNameHint": "Nombre artístico (opcional)",
+  "authRegisterUsernameHint": "@username",
+  "authRegisterEmailHint": "Correo electrónico",
+  "authRegisterPasswordHint": "Contraseña",
+  "authRegisterDisciplineTitle": "Selecciona tus intereses",
+  "authRegisterDisciplineSubtitle": "Elige hasta 5 categorías. Con esto personalizamos Para ti.",
+  "authRegisterInterestsMaxReached": "Ya elegiste 5 intereses, quita uno para elegir otro",
+  "authRegisterInterestsCount": "{count}/5 seleccionados",
+  "@authRegisterInterestsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "authRegisterDisciplineIllustration": "Ilustración",
+  "authRegisterDisciplineMusic": "Música",
+  "authRegisterDisciplinePhotography": "Fotografía",
+  "authRegisterDisciplineWriting": "Escritura",
+  "authRegisterDisciplineDesign": "Diseño",
+  "authRegisterDisciplineVideo": "Video",
+  "authRegisterDisciplineSculpture": "Escultura",
+  "authRegisterDisciplineArchitecture": "Arquitectura",
+  "authRegisterDisciplinePerformance": "Performance",
+  "authRegisterDisciplineOther": "Otro",
+  "authRegisterAboutTitle": "Sobre ti",
+  "authRegisterAboutSubtitle": "Escribe una pequeña descripción para tu perfil.",
+  "authRegisterBioHint": "Ejemplo: Soy artista digital apasionado por crear personajes, mundos creativos y experiencias visuales únicas.",
+  "authRegisterFinishButton": "Finalizar",
+  "authRegisterFullNameValidationError": "Ingresa tu nombre",
+  "authRegisterUsernameValidationError": "Mínimo 3 caracteres, sin espacios",
+  "authRegisterEmailValidationError": "Ingresa un correo válido",
+  "authRegisterPasswordValidationError": "Mínimo 6 caracteres",
+  "authRegisterEmailTakenError": "Este correo ya está registrado",
+  "authRegisterUsernameTakenError": "Este nombre de usuario ya está en uso",
+  "authRegisterSelectDisciplineError": "Selecciona al menos un interés para continuar",
+  "authRegisterSuccessMessage": "Cuenta creada. Inicia sesión para continuar.",
+  "editProfileTitle": "Editar perfil",
+  "editProfileNameLabel": "Nombre",
+  "editProfileBioLabel": "Info",
+  "chatEditMessageDialogTitle": "Editar mensaje",
+  "chatMessageForwardedSnackbar": "Mensaje reenviado",
+  "chatOnlineStatusLabel": "En línea",
+  "chatMessageInputHint": "Mensaje...",
+  "chatTabChats": "Chats",
+  "chatTabStatuses": "Estados",
+  "chatTabCalls": "Llamadas",
+  "chatMyStatusTitle": "Mi estado",
+  "chatMyStatusSubtitle": "Añade una actualización",
+  "chatRecentSectionTitle": "Recientes",
+  "chatViewedSectionTitle": "Vistos",
+  "chatForwardActionLabel": "Reenviar",
+  "chatComposerImageTitle": "Fotos seleccionadas ({count})",
+  "@chatComposerImageTitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "chatComposerVideoTitle": "Videos seleccionados ({count})",
+  "@chatComposerVideoTitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "chatComposerCaptionHint": "Agrega un pie de foto (opcional)",
+  "chatComposerSendButton": "Enviar",
+  "chatMediaSaveButton": "Guardar",
+  "chatMediaSavedSuccess": "Guardado en la galería",
+  "chatMediaSaveError": "No se pudo guardar el archivo",
+  "chatIncomingCallLabel": "Llamada entrante",
+  "chatMissedCallLabel": "Llamada perdida",
+  "chatCallingVoiceLabel": "Llamando…",
+  "chatCallingVideoLabel": "Videollamada…",
+  "chatNoStatusesLabel": "Aún no hay historias recientes",
+  "homeAddStoryLabel": "Tu historia",
+  "storyVisibilityPublic": "Público",
+  "storyVisibilityFollowers": "Solo seguidores",
+  "storyViewersCount": "{count, plural, =0{Nadie ha visto esto aún} one{1 vista} other{{count} vistas}}",
+  "@storyViewersCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "storyViewersTitle": "Quién vio tu historia",
+  "storyViewersEmpty": "Aún nadie ha visto esta historia",
+  "storyReplyHint": "Responder a la historia…",
+  "storyReplyMessagePrefix": "Respondió a tu historia: {text}",
+  "@storyReplyMessagePrefix": {
+    "placeholders": {
+      "text": {
+        "type": "String"
+      }
+    }
+  },
+  "storyDeleteConfirmTitle": "Eliminar historia",
+  "storyDeleteConfirmMessage": "Esta historia se eliminará para siempre. ¿Quieres continuar?",
+  "collabActiveTitle": "Colaboraciones",
+  "collabActiveSubtitle": "Encuentra proyectos o crea el tuyo",
+  "collabActiveNavDiscover": "Descubrir",
+  "collabActiveNavCollaborate": "Colaborar",
+  "collabActiveNavMessages": "Mensajes",
+  "collabActiveNavAchievements": "Logros",
+  "collabActiveNavSubscriptions": "Suscripciones",
+  "collabActiveProgressLabel": "Progreso del Proyecto",
+  "collabActiveViewDetails": "Ver Detalles",
+  "collabActivePublish": "Publicar",
+  "collabActiveCreateProject": "Crear Proyecto",
+  "collabExploreTitle": "Colaboraciones",
+  "collabExploreSubtitle": "Encuentra proyectos o crea el tuyo",
+  "collabExploreTabDiscover": "Descubrir Proyectos",
+  "collabExploreTabMine": "Mis Colaboraciones",
+  "collabExplorePublish": "Publicar",
+  "collabExploreCreateProject": "Crear Proyecto",
+  "communitiesScreenTitle": "Comunidades",
+  "communitiesHeading": "Comunidades",
+  "communitiesSubtitle": "Encuentra personas que comparten tus intereses",
+  "communitiesStatCommunities": "Comunidades",
+  "communitiesStatTrending": "Tendencias",
+  "communitiesStatVerified": "Verificadas",
+  "communitiesStatMine": "Mis comunidades",
+  "communitiesSearchHint": "Buscar por nombre, categoría o hashtag...",
+  "communitiesFeaturedTitle": "⭐ Destacadas",
+  "communitiesSeeAll": "Ver todas",
+  "communitiesHotBadge": "HOT",
+  "communitiesMemberLabel": "Miembro",
+  "communitiesJoinLabel": "Unirse",
+  "communitiesEmptyTitle": "No se encontraron comunidades",
+  "communitiesEmptySubtitle": "Prueba otra búsqueda o explora nuevas categorías.",
+  "communitiesExploringSnackbar": "Explorando nuevas comunidades...",
+  "communitiesExploreButton": "Explorar",
+  "communitiesSectionMine": "Mis comunidades",
+  "communitiesSectionDiscover": "Descubrir comunidades",
+  "communitiesSectionRecommended": "Comunidades recomendadas",
+  "communitiesSectionPopular": "Comunidades populares",
+  "communitiesSectionNew": "Comunidades nuevas",
+  "communitiesSectionActive": "Más activas",
+  "communitiesCreateButton": "Crear comunidad",
+  "communitiesNoneJoinedHint": "Aún no te has unido a ninguna comunidad.",
+  "communitiesPrivateBadge": "Privada",
+  "communitiesPublicBadge": "Pública",
+  "communitiesPostsCount": "{count} publicaciones",
+  "@communitiesPostsCount": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "communitiesRequestPendingLabel": "Solicitud enviada",
+  "communitiesRequestLabel": "Solicitar",
+  "communitiesViewButton": "Ver comunidad",
+  "communityCreateTitle": "Crear comunidad",
+  "communityCreateNameLabel": "Nombre",
+  "communityCreateNameHint": "Ej. Dibujo Digital MX",
+  "communityCreateDescriptionLabel": "Descripción",
+  "communityCreateDescriptionHint": "¿De qué trata esta comunidad?",
+  "communityCreateIconLabel": "Ícono",
+  "communityCreateCoverLabel": "Portada",
+  "communityCreateCategoryLabel": "Categoría",
+  "communityCreateSubcategoryLabel": "Subcategoría (opcional)",
+  "communityCreateSubcategoryNone": "Ninguna",
+  "communityCreateHashtagsLabel": "Hashtags",
+  "communityCreateHashtagsHint": "Sepáralos con comas",
+  "communityCreatePrivacyLabel": "Tipo de comunidad",
+  "communityCreatePrivacyPublic": "Pública",
+  "communityCreatePrivacyPublicDesc": "Cualquiera puede verla y unirse",
+  "communityCreatePrivacyPrivate": "Privada",
+  "communityCreatePrivacyPrivateDesc": "Los usuarios deben solicitar unirse",
+  "communityCreateRulesLabel": "Reglas (opcional)",
+  "communityCreateRulesHint": "Normas de convivencia de la comunidad",
+  "communityCreateSubmitButton": "Crear comunidad",
+  "communityCreateNameRequiredError": "Ingresa un nombre",
+  "communityCreateDescriptionRequiredError": "Ingresa una descripción",
+  "communityCreatedSnackbar": "¡Comunidad creada!",
+  "communityDetailJoinButton": "Unirse",
+  "communityDetailRequestButton": "Solicitar unirse",
+  "communityDetailPendingButton": "Solicitud pendiente",
+  "communityDetailLeaveButton": "Salir",
+  "communityDetailOwnerCannotLeave": "Eres el creador: elimina la comunidad en vez de salir.",
+  "communityDetailAboutTab": "Información",
+  "communityDetailPostsTab": "Publicaciones",
+  "communityDetailMembersTab": "Miembros",
+  "communityDetailRulesTitle": "Reglas",
+  "communityDetailNoRules": "Esta comunidad no tiene reglas específicas.",
+  "communityDetailAdminsTitle": "Administración",
+  "communityDetailOwnerLabel": "Creador",
+  "communityDetailModeratorLabel": "Moderador",
+  "communityDetailMemberRoleLabel": "Miembro",
+  "communityDetailMembersCount": "{count} miembros",
+  "@communityDetailMembersCount": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "communityDetailPostsEmpty": "Aún no hay publicaciones en esta comunidad.",
+  "communityDetailCreatePostButton": "Publicar en la comunidad",
+  "communityDetailJoinToPost": "Únete a la comunidad para publicar.",
+  "communityDetailPrivateLocked": "Esta comunidad es privada. Únete para ver su contenido.",
+  "communityDetailRequestsTitle": "Solicitudes pendientes",
+  "communityDetailRequestsEmpty": "No hay solicitudes pendientes.",
+  "communityDetailApprove": "Aceptar",
+  "communityDetailReject": "Rechazar",
+  "communityDetailPromote": "Hacer moderador",
+  "communityDetailDemote": "Quitar moderador",
+  "communityDetailRemoveMember": "Expulsar",
+  "communityDetailDeleteButton": "Eliminar comunidad",
+  "communityDetailDeleteConfirmTitle": "Eliminar comunidad",
+  "communityDetailDeleteConfirmMessage": "Esta acción no se puede deshacer. Se eliminará la comunidad para todos los miembros.",
+  "communityJoinRequestSentSnackbar": "Solicitud enviada. Un administrador la revisará.",
+  "createPostTypePost": "Publicación",
+  "createPostTypeStory": "Historia",
+  "createPostTypeReel": "Reel",
+  "createPostTypeDrawing": "Dibujo",
+  "createPostTypeArticle": "Artículo",
+  "createArticleBoldTooltip": "Negrita",
+  "createArticleItalicTooltip": "Cursiva",
+  "createArticleUnderlineTooltip": "Subrayado",
+  "createArticleBulletTooltip": "Lista",
+  "createArticleTitleTooltip": "Encabezado",
+  "createArticleTitleHint": "Título de tu historia",
+  "createArticleBodyHint": "Había una vez...",
+  "createArticleWordCount": "{count} palabras",
+  "@createArticleWordCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "imageEditorTitle": "Editar imagen",
+  "imageEditorAspectOriginal": "Original",
+  "imageEditorBrightness": "Brillo",
+  "imageEditorContrast": "Contraste",
+  "imageEditorSaturation": "Saturación",
+  "mediaEditButton": "Editar",
+  "mediaTrimButton": "Recortar",
+  "videoTrimTitle": "Recortar video",
+  "audioTrimTitle": "Recortar audio",
+  "trimStartLabel": "Inicio: {time}",
+  "@trimStartLabel": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "trimEndLabel": "Fin: {time}",
+  "@trimEndLabel": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "petStoreSectionTitle": "Mascota virtual",
+  "petStoreSectionSubtitle": "Función de prueba: adopta una mascota y cuídala desde tu perfil",
+  "petAlreadyOwnedLabel": "Ya tienes una mascota",
+  "petNameDialogTitle": "Ponle un nombre",
+  "petNameDialogHint": "Nombre de tu mascota",
+  "petAdoptButton": "Adoptar",
+  "petPurchaseSuccess": "¡Adoptaste a tu mascota!",
+  "petProfileSectionTitle": "Mascota virtual",
+  "petLevelLabel": "Nivel {level}",
+  "@petLevelLabel": {
+    "placeholders": {
+      "level": {
+        "type": "int"
+      }
+    }
+  },
+  "petHungerLabel": "Hambre",
+  "petHappinessLabel": "Felicidad",
+  "petFeedButton": "Alimentar",
+  "petPlayButton": "Jugar",
+  "petRemoveButton": "Eliminar mascota",
+  "petRemoveConfirmTitle": "Eliminar mascota",
+  "petRemoveConfirmMessage": "¿Seguro que quieres eliminar a tu mascota? No podrás recuperarla.",
+  "petCuddleButton": "Mimar",
+  "petDetailScreenTitle": "Tu mascota",
+  "petTapHint": "Tócala para mimarla",
+  "petMoodEcstatic": "Eufórico",
+  "petMoodHappy": "Feliz",
+  "petMoodNeutral": "Tranquilo",
+  "petMoodSad": "Triste",
+  "petMoodCritical": "Necesita atención",
+  "petStageBaby": "Cría",
+  "petStageYoung": "Joven",
+  "petStageAdult": "Adulto",
+  "petXpToNextLabel": "{xp} XP para el siguiente nivel",
+  "@petXpToNextLabel": {
+    "placeholders": {
+      "xp": {
+        "type": "int"
+      }
+    }
+  },
+  "petLevelUpMessage": "¡{name} subió a nivel {level}!",
+  "@petLevelUpMessage": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "level": {
+        "type": "int"
+      }
+    }
+  },
+  "createRoleArtist": "🎨 Artista",
+  "createRoleMusician": "🎵 Músico",
+  "createRoleProgrammer": "💻 Programador",
+  "createRoleWriter": "📝 Escritor",
+  "createRoleEditor": "🎬 Editor",
+  "createRoleScreenwriter": "🧠 Guionista",
+  "createPublishSuccessMessage": "Publicado con éxito",
+  "createPublishSuccessWithCoins": "Publicado con éxito · +{coins} ZCoins",
+  "@createPublishSuccessWithCoins": {
+    "placeholders": {
+      "coins": {
+        "type": "int"
+      }
+    }
+  },
+  "createScreenTitle": "Crear",
+  "createPublishButton": "Publicar",
+  "createTabNewPost": "Nueva publicación",
+  "createTabProject": "Proyecto",
+  "createTabCollaboration": "Colaboración",
+  "createActionImage": "Imagen",
+  "createActionVideo": "Video",
+  "createActionFile": "Archivo",
+  "createActionCamera": "Cámara",
+  "createActionTakePhoto": "Tomar foto",
+  "createActionRecordVideo": "Grabar video",
+  "createActionSelectReel": "Seleccionar Reel",
+  "createActionOpenCanvas": "Abrir lienzo",
+  "drawingCanvasTitle": "Lienzo",
+  "drawingCanvasUndo": "Deshacer",
+  "drawingCanvasClear": "Borrar todo",
+  "drawingCanvasSave": "Listo",
+  "createContentGuidelineText": "Comparte contenido creativo y respetuoso.",
+  "createPostHint": "¿Qué quieres compartir?",
+  "createSectionHashtags": "Hashtags",
+  "createProjectTitleHint": "Título del proyecto",
+  "createProjectDescriptionHint": "Describe tu proyecto...",
+  "createSectionProgress": "Progreso",
+  "createProjectProgressPercent": "{percent}% completado",
+  "@createProjectProgressPercent": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "createSectionRolesNeeded": "Roles necesarios",
+  "createSectionProjectFiles": "Archivos del proyecto",
+  "createCollabSearchHint": "¿Qué estás buscando?",
+  "createCollabDescriptionHint": "Describe tu colaboración...",
+  "createSectionSkills": "Habilidades",
+  "createPublicCollabTitle": "Colaboración pública",
+  "createPublicCollabSubtitle": "Cualquier usuario puede aplicar.",
+  "createFileSizeKb": "{size} KB",
+  "@createFileSizeKb": {
+    "placeholders": {
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "createUploadFilesTitle": "Subir archivos",
+  "createUploadFilesSubtitle": "PDF, Word, ZIP, imágenes, videos y código.",
+  "eventsFilterAll": "Todos",
+  "eventsFilterToday": "Hoy",
+  "eventsFilterWeek": "Semana",
+  "eventsFilterMonth": "Mes",
+  "eventsFilterOnline": "Online",
+  "eventsFilterInPerson": "Presencial",
+  "eventsScreenTitle": "Eventos",
+  "eventsHeading": "Descubre eventos",
+  "eventsSubtitle": "Participa en concursos, hackathones y eventos para creadores.",
+  "eventsStatEventsLabel": "Eventos",
+  "eventsStatFeaturedLabel": "Destacados",
+  "eventsRegisteredLabel": "Registrado",
+  "eventsStatAttendeesLabel": "Asistentes",
+  "eventsSearchHint": "Buscar eventos...",
+  "eventsFeaturedSectionTitle": "⭐ Eventos destacados",
+  "eventsSeeAllButton": "Ver todos",
+  "eventsFeaturedBadge": "DESTACADO",
+  "eventsJoinButton": "Participar",
+  "eventsEmptyTitle": "No se encontraron eventos",
+  "eventsEmptySubtitle": "Intenta con otra búsqueda o cambia el filtro seleccionado.",
+  "eventsEmptySnackbarMessage": "Explorando nuevos eventos...",
+  "eventsEmptyActionButton": "Explorar eventos",
+  "exploreCategoryVisualArt": "Arte Visual",
+  "exploreCategoryMusic": "Música",
+  "exploreCategoryLiterature": "Literatura",
+  "exploreCategoryVideogames": "Videojuegos",
+  "exploreCategoryPhotography": "Fotografía",
+  "exploreCategoryDesign": "Diseño",
+  "categoryDetailFilterAll": "Todos",
+  "categoryDetailFilterPopular": "Populares",
+  "categoryDetailFilterNew": "Nuevos",
+  "categoryDetailFilterTrending": "Tendencias",
+  "categoryDetailFilterFollowing": "Siguiendo",
+  "friendsScreenTitle": "Amigos",
+  "friendsHeading": "Conecta con tu comunidad",
+  "friendsSubtitle": "Encuentra amigos, colaboradores y creadores.",
+  "friendsTabRequests": "Solicitudes",
+  "friendsStatFavoritesLabel": "Favoritos",
+  "friendsStatVerifiedLabel": "Verificados",
+  "friendsSearchHint": "Buscar amigos...",
+  "friendsEmptyTitle": "No se encontraron amigos",
+  "friendsEmptySubtitle": "Prueba con otro nombre o envía nuevas solicitudes de amistad.",
+  "friendsEmptySnackbarMessage": "Buscar nuevos amigos",
+  "friendsEmptyActionButton": "Buscar amigos",
+  "homePageNavFeedLabel": "Inicio",
+  "homePageNavChatLabel": "Chat",
+  "homePageNavProfileLabel": "Perfil",
+  "likesTitle": "Likes",
+  "likesHeading": "Contenido que te gustó",
+  "likesSubtitle": "Todas las publicaciones que marcaste con ❤️",
+  "likesFilterAll": "Todos",
+  "likesFilterPosts": "Posts",
+  "likesFilterReels": "Reels",
+  "likesFilterStories": "Historias",
+  "likesFilterProjects": "Proyectos",
+  "likesSearchHint": "Buscar publicaciones...",
+  "likesRemovedSnackbar": "{title} eliminado de Likes",
+  "@likesRemovedSnackbar": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "likesRemoveFromSaved": "Quitar de Guardados",
+  "likesRemoveLike": "Quitar Like",
+  "likesEmptyTitle": "Aún no tienes Likes",
+  "likesEmptySubtitle": "Las publicaciones que marques con ❤️ aparecerán aquí.",
+  "creatorDetailFollowersLabel": "Seguidores",
+  "creatorDetailLikesLabel": "Likes",
+  "creatorDetailPostsLabel": "Posts",
+  "creatorDetailTabPosts": "Publicaciones",
+  "creatorDetailTabPortfolio": "Portafolio",
+  "creatorDetailTabCollaborations": "Colaboraciones",
+  "creatorDetailInProgressBadge": "En progreso",
+  "profilePostsLabel": "Publicaciones",
+  "profileFollowersLabel": "Seguidores",
+  "profileFollowingLabel": "Siguiendo",
+  "profileEditButton": "Editar perfil",
+  "publicProfileFollowButton": "Seguir",
+  "publicProfileFollowingButton": "Siguiendo",
+  "publicProfileMessageButton": "Mensaje",
+  "publicProfileNoPosts": "Aún no ha publicado nada.",
+  "profileTabPosts": "Publicaciones",
+  "profileTabProjects": "Proyectos",
+  "profileTabPortfolio": "Portafolio",
+  "profileTabCommunities": "Comunidades",
+  "profileTabAchievements": "Logros",
+  "profileHighlightsLabel": "Destacada",
+  "personalizeProfileScreenTitle": "Personalizar perfil",
+  "personalizeFrameTitle": "Marco del avatar",
+  "personalizeBadgesTitle": "Logros destacados ({count}/{max})",
+  "@personalizeBadgesTitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "personalizeBadgesSubtitle": "Elige hasta 3 logros para mostrar en tu perfil",
+  "personalizeBadgesEmpty": "Todavía no desbloqueas logros. Consíguelos dando like, comentando o publicando.",
+  "profileMenuPersonalizeItem": "Personalizar perfil",
+  "profileNoPostsYet": "Aún no has publicado nada.",
+  "profileNoProjectsYet": "Aún no has creado proyectos.",
+  "profileNoCommunitiesYet": "Aún no perteneces a ninguna comunidad.",
+  "profileNoAchievementsYet": "Aún no desbloqueas logros.",
+  "portfolioEmptyTitle": "Tu portafolio está vacío",
+  "portfolioEmptySubtitle": "Agrega tus mejores trabajos para mostrarlos aquí.",
+  "portfolioAddButton": "Agregar al portafolio",
+  "portfolioAddTitle": "Agregar al portafolio",
+  "portfolioTitleHint": "Título del trabajo",
+  "portfolioTitleRequired": "Ingresa un título",
+  "portfolioDescriptionHint": "Descripción",
+  "portfolioToolsHint": "Herramientas/tecnologías (separadas por comas)",
+  "portfolioLinkHint": "Enlace externo (opcional)",
+  "portfolioStatusConcept": "Concepto",
+  "portfolioStatusInProgress": "En progreso",
+  "portfolioStatusCompleted": "Terminado",
+  "portfolioOpenLinkButton": "Abrir enlace",
+  "collabWantToCollabButton": "Quiero colaborar",
+  "collabRequestSentLabel": "Solicitud enviada",
+  "collabRequestSentSnackbar": "Tu solicitud fue enviada",
+  "collabReviewRequests": "Ver solicitudes",
+  "collabReviewRequestsWithCount": "Ver solicitudes ({count})",
+  "@collabReviewRequestsWithCount": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "collabRequestsScreenTitle": "Solicitudes de colaboración",
+  "collabRequestsEmpty": "Aún no hay solicitudes para esta publicación.",
+  "collabStatusPending": "Pendiente",
+  "collabStatusAccepted": "Aceptada",
+  "collabStatusRejected": "Rechazada",
+  "collabStatusCompleted": "Finalizada",
+  "collabAccept": "Aceptar",
+  "collabReject": "Rechazar",
+  "collabMarkCompleted": "Marcar como finalizada",
+  "challengesTabOfficial": "Oficiales",
+  "challengesTabCreative": "Creativos",
+  "challengesCreativeEmpty": "No hay retos creativos activos por ahora.",
+  "challengeCreateTitle": "Crear reto",
+  "challengeCreateButton": "Crear reto",
+  "challengeTitleHint": "Título del reto",
+  "challengeTitleRequired": "Ingresa un título",
+  "challengeDescriptionHint": "¿En qué consiste el reto?",
+  "challengePersonalOption": "Reto personal",
+  "challengeStartDateLabel": "Inicio",
+  "challengeEndDateLabel": "Fin",
+  "challengeRulesHint": "Reglas (opcional)",
+  "challengeParticipantsCount": "{count} participantes",
+  "@challengeParticipantsCount": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "challengeDatesRange": "Del {start} al {end}",
+  "@challengeDatesRange": {
+    "placeholders": {
+      "start": { "type": "String" },
+      "end": { "type": "String" }
+    }
+  },
+  "challengeParticipateButton": "Participar",
+  "challengeSubmitEntryButton": "Publicar mi participación",
+  "challengeEntriesTitle": "Participaciones",
+  "challengeEntriesEmpty": "Aún no hay participaciones en este reto.",
+  "forYouScreenTitle": "Para ti",
+  "forYouCreatorsTitle": "Creadores que podrían interesarte",
+  "forYouCommunitiesTitle": "Comunidades que podrían interesarte",
+  "forYouChallengesTitle": "Retos para ti",
+  "forYouContentTitle": "Contenido recomendado",
+  "forYouEmptyTitle": "Todavía no tenemos recomendaciones para ti",
+  "forYouEmptySubtitle": "Sigue a otros creadores, únete a comunidades y da like a publicaciones para que Para ti empiece a personalizarse.",
+  "profileMenuHeaderTitle": "Perfil",
+  "profileMenuLogout": "Cerrar sesión",
+  "profileMenuLogoutConfirmMessage": "¿Estás seguro de que deseas cerrar sesión?",
+  "profileMenuLogoutConfirmAction": "Salir",
+  "profileMenuSectionAccount": "👤 Cuenta",
+  "profileMenuSectionActivity": "❤️ Actividad",
+  "profileMenuSectionSocial": "👥 Social",
+  "profileMenuSectionZentry": "💎 Zentry",
+  "profileMenuSectionSettings": "⚙ Configuración",
+  "profileMenuSectionHelp": "❓ Ayuda",
+  "profileMenuEditProfileItem": "Editar perfil",
+  "profileMenuChangePhotoItem": "Cambiar foto",
+  "profileMenuViewPublicProfileItem": "Ver perfil público",
+  "profileMenuQrCodeItem": "Código QR",
+  "profileMenuLikesItem": "Likes",
+  "profileMenuSavedItem": "Guardados",
+  "profileMenuHistoryItem": "Historial",
+  "profileMenuFriendsItem": "Amigos",
+  "profileMenuSubscriptionItem": "Mi suscripción",
+  "profileMenuBadgesItem": "Insignias",
+  "profileMenuStatsItem": "Estadísticas",
+  "profileMenuPortfolioItem": "Portafolio",
+  "profileMenuThemeItem": "Tema",
+  "profileMenuLanguageItem": "Idioma",
+  "profileMenuNotificationsItem": "Notificaciones",
+  "profileMenuPrivacyItem": "Privacidad",
+  "profileMenuSecurityItem": "Seguridad",
+  "profileMenuHelpCenterItem": "Centro de ayuda",
+  "profileMenuReportProblemItem": "Reportar un problema",
+  "profileMenuAboutItem": "Acerca de Zentry",
+  "savedScreenTitle": "Guardados",
+  "savedPostsSectionTitle": "Publicaciones guardadas",
+  "savedPostsEmptyHint": "Aún no has guardado publicaciones. Toca el ícono de guardar en una publicación para verla aquí.",
+  "savedCollectionsHeading": "Tus colecciones",
+  "savedCollectionsSubtitle": "Organiza tus publicaciones favoritas en colecciones.",
+  "savedCollectionsStatLabel": "Colecciones",
+  "savedFavoritesStatLabel": "Favoritos",
+  "savedStorageStatLabel": "Espacio",
+  "savedSearchHint": "Buscar colección...",
+  "savedNewCollectionLabel": "Nueva colección",
+  "savedCollectionNameHint": "Nombre",
+  "savedCreateButton": "Crear",
+  "savedRenameOption": "Renombrar",
+  "savedPostsCountLabel": "{count} publicaciones",
+  "@savedPostsCountLabel": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "savedOpenButton": "Abrir",
+  "savedEmptyTitle": "No hay colecciones",
+  "savedEmptySubtitle": "Crea tu primera colección para organizar tus publicaciones.",
+  "achievementsScreenTitle": "Logros",
+  "achievementsUnlockedStat": "Desbloqueados",
+  "achievementsProgressStat": "Progreso",
+  "achievementsPointsStat": "Puntos",
+  "achievementsRankStat": "Rango",
+  "achievementsGeneralProgressTitle": "Progreso general",
+  "achievementsLike1Title": "Primer me gusta",
+  "achievementsLike1Desc": "Dale me gusta a una publicación",
+  "achievementsLike5Title": "Corazón generoso",
+  "achievementsLike5Desc": "Da 5 me gusta a publicaciones",
+  "achievementsLike25Title": "Fan número uno",
+  "achievementsLike25Desc": "Da 25 me gusta a publicaciones",
+  "achievementsLike100Title": "Coleccionista de likes",
+  "achievementsLike100Desc": "Da 100 me gusta a publicaciones",
+  "achievementsStreak3Title": "Racha inicial",
+  "achievementsStreak3Desc": "Entra 3 días seguidos",
+  "achievementsStreak7Title": "Semana completa",
+  "achievementsStreak7Desc": "Entra 7 días seguidos",
+  "achievementsStreak30Title": "Fiel a Zentry",
+  "achievementsStreak30Desc": "Entra 30 días seguidos",
+  "achievementsPosts1Title": "Primer trazo",
+  "achievementsPosts1Desc": "Publica tu primer contenido",
+  "achievementsPosts10Title": "Creador constante",
+  "achievementsPosts10Desc": "Publica 10 veces",
+  "achievementsPosts50Title": "Máquina creativa",
+  "achievementsPosts50Desc": "Publica 50 veces",
+  "achievementsComments10Title": "Conversador",
+  "achievementsComments10Desc": "Comenta 10 veces",
+  "achievementsComments50Title": "Voz de la comunidad",
+  "achievementsComments50Desc": "Comenta 50 veces",
+  "achievementsSaves10Title": "Curador",
+  "achievementsSaves10Desc": "Guarda 10 publicaciones",
+  "achievementsShares10Title": "Difusor",
+  "achievementsShares10Desc": "Comparte 10 publicaciones",
+  "achievementsRarityCommon": "Común",
+  "achievementsRarityRare": "Rara",
+  "achievementsRarityEpic": "Épica",
+  "achievementsRarityLegendary": "Legendaria",
+  "achievementsUnlockedBadge": "Desbloqueado ✔",
+  "achievementsFilterAll": "Todas",
+  "achievementsFilterUnlocked": "Desbloqueadas",
+  "achievementsFilterLocked": "Bloqueadas",
+  "achievementsEmptyFilterLabel": "No hay logros en este filtro todavía",
+  "achievementsCategoryLikes": "Me gusta",
+  "achievementsCategoryStreak": "Racha",
+  "achievementsCategoryPosts": "Publicaciones",
+  "achievementsCategoryComments": "Comentarios",
+  "achievementsCategorySaves": "Guardados",
+  "achievementsCategoryShares": "Compartidos",
+  "achievementsRankBronze": "Bronce",
+  "achievementsRankSilver": "Plata",
+  "achievementsRankGold": "Oro",
+  "achievementsRankPlatinum": "Platino",
+  "achievementsRankDiamond": "Diamante",
+  "achievementsRankMaster": "Maestro",
+  "achievementsStreakSectionTitle": "Racha de actividad",
+  "achievementsStreakSubtitle": "Entra todos los días para mantenerla",
+  "achievementsStreakDaysLabel": "{count} días seguidos",
+  "@achievementsStreakDaysLabel": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "achievementsStreakBestLabel": "Récord: {count} días",
+  "@achievementsStreakBestLabel": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "achievementsStreakRewardLabel": "+{points} pts hoy",
+  "@achievementsStreakRewardLabel": {
+    "placeholders": {
+      "points": {
+        "type": "int"
+      }
+    }
+  },
+  "achievementsStreakPointsTotalLabel": "{points} pts de racha acumulados",
+  "@achievementsStreakPointsTotalLabel": {
+    "placeholders": {
+      "points": {
+        "type": "int"
+      }
+    }
+  },
+  "homeStreakChipLabel": "{count} días",
+  "@homeStreakChipLabel": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "qrScreenTitle": "Tu código QR",
+  "qrScreenSubtitle": "Compártelo para que te encuentren en Zentry",
+  "profileStatsScreenTitle": "Estadísticas",
+  "profileStatsWeeklyLikes": "Me gusta dados esta semana",
+  "profileStatsWeeklySaves": "Guardados esta semana",
+  "profileStatsWeeklyShares": "Compartidos esta semana",
+  "profileStatsWeeklyVisits": "Visitas a tu perfil",
+  "profileStatsTotalLabel": "{count} esta semana",
+  "@profileStatsTotalLabel": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "profileStatsContentTitle": "Rendimiento de tu contenido",
+  "profileStatsTotalPosts": "Publicaciones",
+  "profileStatsTotalReactions": "Reacciones recibidas",
+  "profileStatsTotalComments": "Comentarios recibidos",
+  "profileStatsTotalFollowers": "Seguidores",
+  "profileStatsTopContentTitle": "Contenido con mejor rendimiento",
+  "profileStatsNoPostsYet": "Aún no tienes publicaciones. Cuando publiques algo, verás aquí su rendimiento.",
+  "profileStatsViewsUnavailable": "Las vistas por publicación aún no están disponibles",
+  "homeCommentHint": "Escribe un comentario...",
+  "streakScreenTitle": "Racha",
+  "streakScreenActiveToday": "Racha encendida hoy",
+  "streakScreenInactiveToday": "Da like, comenta o publica para encenderla hoy",
+  "streakScreenWeekTitle": "Actividad de la semana",
+  "streakScreenExplainer": "La racha se enciende la primera vez en el día que das like, comentas o publicas algo. Si un día pasa sin actividad, la racha se reinicia.",
+  "challengesScreenTitle": "Retos",
+  "challengesScreenSubtitle": "Cumple retos semanales y gana ZCoins para la Tienda.",
+  "challengeLikes15Title": "Repartidor de cariño",
+  "challengeLikes15Desc": "Da 15 me gusta esta semana",
+  "challengePosts3Title": "Creador activo",
+  "challengePosts3Desc": "Publica 3 veces esta semana",
+  "challengeComments5Title": "Conversador",
+  "challengeComments5Desc": "Comenta 5 veces esta semana",
+  "challengeShares5Title": "Difusor",
+  "challengeShares5Desc": "Comparte 5 veces esta semana",
+  "challengeSaves5Title": "Coleccionista",
+  "challengeSaves5Desc": "Guarda 5 publicaciones esta semana",
+  "challengeStreak5Title": "Constancia",
+  "challengeStreak5Desc": "Alcanza una racha de 5 días esta semana",
+  "challengeLikes30Title": "Generosidad",
+  "challengeLikes30Desc": "Da 30 me gusta esta semana",
+  "challengePosts5Title": "Semana productiva",
+  "challengePosts5Desc": "Publica 5 veces esta semana",
+  "challengeComments15Title": "Voz activa",
+  "challengeComments15Desc": "Comenta 15 veces esta semana",
+  "challengeProgressLabel": "{current}/{total} esta semana",
+  "@challengeProgressLabel": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "challengeClaimedSnackbar": "¡{coins} ZCoins reclamados!",
+  "@challengeClaimedSnackbar": {
+    "placeholders": {
+      "coins": {
+        "type": "int"
+      }
+    }
+  },
+  "challengeClaimedLabel": "Reclamado",
+  "challengeClaimLabel": "Reclamar",
+  "storeScreenTitle": "Tienda",
+  "storeScreenBalanceLabel": "ZCoins disponibles",
+  "storeScreenColorsSectionTitle": "Colores de tema",
+  "storeScreenColorsSectionSubtitle": "Desbloquea colores premium para personalizar tu perfil y tu tema.",
+  "storeScreenOwnedLabel": "Comprado",
+  "storeScreenPurchaseSuccess": "¡Color desbloqueado!",
+  "storeScreenBuyButton": "Comprar",
+  "appearanceGoToStore": "Ir a la Tienda de colores",
+  "profileMenuChallengesItem": "Retos y desafíos",
+  "profileMenuZCoinsItem": "ZCoins: {count}",
+  "@profileMenuZCoinsItem": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "appearanceScreenTitle": "Apariencia",
+  "appearanceHeading": "Personaliza Zentry",
+  "appearanceSubtitle": "Haz que la aplicación se adapte a tu estilo.",
+  "appearanceColorsStat": "Colores",
+  "appearanceEffectsStat": "Efectos",
+  "appearanceThemeCardTitle": "Tema",
+  "appearanceThemeLight": "Claro",
+  "appearanceThemeDark": "Oscuro",
+  "appearanceThemeSystem": "Seguir sistema",
+  "appearanceAccentColorCardTitle": "Color principal",
+  "appearancePreviewCardTitle": "Vista previa",
+  "appearancePreviewName": "Luis Martínez",
+  "appearancePreviewSubtitle": "Así se verá toda la interfaz de Zentry.",
+  "appearanceAccessibilityCardTitle": "Accesibilidad",
+  "appearanceTextSizeLabel": "Tamaño del texto",
+  "appearanceAnimationsTitle": "Animaciones",
+  "appearanceAnimationsSubtitle": "Activar animaciones de la aplicación",
+  "appearanceBlurTitle": "Efecto Blur",
+  "appearanceBlurSubtitle": "Aplicar desenfoque en paneles",
+  "appearanceRoundedCornersTitle": "Esquinas redondeadas",
+  "appearanceRoundedCornersSubtitle": "Aplicar bordes suaves",
+  "appearanceHeroAnimationsTitle": "Hero Animations",
+  "appearanceHeroAnimationsSubtitle": "Animaciones entre pantallas",
+  "appearanceInfoCardTitle": "Información",
+  "appearanceCurrentThemeLabel": "Tema actual",
+  "appearanceColorLabel": "Color",
+  "appearanceScaleLabel": "Escala",
+  "notificationsScreenTitle": "Notificaciones",
+  "notificationsHeading": "Todas tus actividades",
+  "notificationsSubtitle": "Mantente al día con todo lo que ocurre en Zentry.",
+  "notificationsStatTotalLabel": "Notificaciones",
+  "notificationsUnreadLabel": "Sin leer",
+  "notificationsLikesStatLabel": "Likes",
+  "notificationsCommentsStatLabel": "Comentarios",
+  "notificationsSearchHint": "Buscar notificación...",
+  "notificationsRecentActivityTitle": "Actividad reciente",
+  "notificationsReadLabel": "Leída",
+  "notificationsEmptyTitle": "No hay notificaciones",
+  "notificationsEmptySubtitle": "Cuando recibas nuevas actividades aparecerán aquí.",
+  "notificationsEmptyActionButton": "Actualizar",
+  "privacyScreenTitle": "Privacidad",
+  "privacyHeading": "Controla tu privacidad",
+  "privacySubtitle": "Decide quién puede ver tu información y cómo interactúan contigo.",
+  "privacySecurityLabel": "Seguridad",
+  "privacyProfileLabel": "Perfil",
+  "privacyVisibilityPublic": "Público",
+  "privacyVisibilityFollowersOnly": "Solo seguidores",
+  "privacyVisibilityPrivate": "Privado",
+  "privacyPrivateAccountTitle": "Cuenta privada",
+  "privacyPrivateAccountSubtitle": "Solo los seguidores aprobados podrán ver tu contenido.",
+  "privacyMessagesFromFollowers": "Seguidores",
+  "privacyMessagesFromNone": "Nadie",
+  "privacyActivityCardTitle": "Actividad",
+  "privacyShowOnlineStatusTitle": "Mostrar estado en línea",
+  "privacyShowOnlineStatusSubtitle": "Permite que otros sepan cuándo estás conectado.",
+  "privacyShowLastSeenTitle": "Mostrar última conexión",
+  "privacyShowLastSeenSubtitle": "Muestra la última vez que utilizaste Zentry.",
+  "privacyShowInSearchTitle": "Mostrar perfil en búsquedas",
+  "privacyShowInSearchSubtitle": "Permite que otros encuentren tu perfil.",
+  "privacyTwoFactorTitle": "Verificación en dos pasos",
+  "privacyTwoFactorSubtitle": "Añade una capa adicional de seguridad.",
+  "privacyBlockedUsersTitle": "Usuarios bloqueados",
+  "privacyUsersCount": "{count} usuarios",
+  "@privacyUsersCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "privacyMutedUsersTitle": "Usuarios silenciados",
+  "privacyResetSettingsButton": "Restablecer configuración",
+  "securityScreenTitle": "Seguridad",
+  "securityHeading": "Protege tu cuenta",
+  "securitySubtitle": "Administra la seguridad de tu cuenta y controla los accesos.",
+  "securityLevelHighValue": "Alta",
+  "securitySecurityLabel": "Seguridad",
+  "securityDevicesStatLabel": "Dispositivos",
+  "securityActivityStatLabel": "Actividad",
+  "securityStatusActive": "Activo",
+  "securityStatusInactive": "Inactivo",
+  "securityTwoFaStatLabel": "2FA",
+  "securityAuthenticationCardTitle": "Autenticación",
+  "securityChangePasswordTitle": "Cambiar contraseña",
+  "securityChangePasswordSubtitle": "Actualiza tu contraseña periódicamente.",
+  "securityTwoFactorTitle": "Verificación en dos pasos",
+  "securityTwoFactorSubtitle": "Añade una capa extra de seguridad.",
+  "securityPasskeysTitle": "Llaves de acceso (Passkeys)",
+  "securityPasskeysSubtitle": "Inicia sesión sin contraseña.",
+  "securityTrustedDevicesCardTitle": "Dispositivos confiables",
+  "securityCurrentDeviceBadge": "Actual",
+  "securityRecentActivityCardTitle": "Actividad reciente",
+  "securityAlertsCardTitle": "Alertas",
+  "securityLoginAlertsTitle": "Alertas de inicio de sesión",
+  "securityLoginAlertsSubtitle": "Notificar cuando haya un nuevo acceso.",
+  "securitySecurityEmailsTitle": "Correos de seguridad",
+  "securitySecurityEmailsSubtitle": "Recibir correos sobre cambios importantes.",
+  "securityLogoutDialogTitle": "Cerrar sesiones",
+  "securityLogoutDialogContent": "¿Deseas cerrar sesión en todos los dispositivos?",
+  "securityLogoutAllButton": "Cerrar todas las sesiones",
+  "settingsScreenSectionAppearance": "Apariencia",
+  "settingsScreenThemeItem": "Tema",
+  "settingsScreenLanguageItem": "Idioma",
+  "settingsScreenSectionNotifications": "Notificaciones",
+  "settingsScreenNotificationsItem": "Notificaciones",
+  "settingsScreenNotificationsSubtitle": "Administrar preferencias",
+  "settingsScreenPrivacyItem": "Privacidad",
+  "settingsScreenPrivacySubtitle": "Cuenta, mensajes y bloqueados",
+  "settingsScreenBiometricAuthTitle": "Autenticación biométrica",
+  "settingsScreenBiometricUnavailable": "Este dispositivo no tiene huella o rostro configurado en el sistema",
+  "settingsScreenSecurityItem": "Seguridad",
+  "settingsScreenSecuritySubtitle": "Contraseña • Verificación en dos pasos",
+  "settingsScreenSectionStorage": "Almacenamiento",
+  "settingsScreenClearCacheItem": "Limpiar caché",
+  "settingsScreenCacheUsedMb": "{size} MB utilizados",
+  "@settingsScreenCacheUsedMb": {
+    "placeholders": {
+      "size": {
+        "type": "int"
+      }
+    }
+  },
+  "settingsScreenManageStorageItem": "Administrar almacenamiento",
+  "settingsScreenManageStorageSubtitle": "Fotos, videos y archivos",
+  "settingsScreenSectionInfo": "Información",
+  "settingsScreenAboutItem": "Acerca de Zentry",
+  "settingsScreenVersionLabel": "Versión {version}",
+  "@settingsScreenVersionLabel": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsScreenTermsItem": "Términos y condiciones",
+  "settingsScreenConsultLabel": "Consultar",
+  "settingsScreenPrivacyPolicyItem": "Política de privacidad",
+  "settingsScreenCommunityBrand": "Zentry Community",
+  "settingsScreenClearCacheDialogContent": "¿Deseas eliminar los archivos temporales?",
+  "settingsScreenSelectThemeDialogTitle": "Seleccionar tema",
+  "settingsScreenThemeDarkOption": "Oscuro",
+  "settingsScreenThemeLightOption": "Claro",
+  "settingsScreenThemeSystemOption": "Sistema",
+  "settingsScreenLanguageEnglishOption": "English",
+  "subscriptionScreenTitle": "Planes de Zentry",
+  "subscriptionUpgradeButton": "Mejorar ahora 🚀",
+  "subscriptionPopularBadge": "🔥 Más popular",
+  "subscriptionCurrentPlanButton": "Plan actual",
+  "subscriptionSelectPlanButton": "Elegir plan",
+  "subscriptionPricePerMonth": "/mes",
+  "subscriptionPlanFreeName": "Gratis",
+  "subscriptionPlanFreeDesc": "Comienza a crear",
+  "subscriptionPlanFreePrice": "$0",
+  "subscriptionPlanFreeFeature1": "Perfil básico",
+  "subscriptionPlanFreeFeature2": "5 colaboraciones",
+  "subscriptionPlanFreeFeature3": "100MB de almacenamiento",
+  "subscriptionPlanProName": "Pro",
+  "subscriptionPlanProDesc": "Haz crecer tu audiencia",
+  "subscriptionPlanProPrice": "$9.99",
+  "subscriptionPlanProFeature1": "Insignia verificada",
+  "subscriptionPlanProFeature2": "Colaboraciones ilimitadas",
+  "subscriptionPlanProFeature3": "5GB de almacenamiento",
+  "subscriptionPlanProFeature4": "Estadísticas",
+  "subscriptionPlanProFeature5": "Soporte prioritario",
+  "subscriptionPlanPremiumName": "Premium",
+  "subscriptionPlanPremiumDesc": "Todo el poder",
+  "subscriptionPlanPremiumPrice": "$24.99",
+  "subscriptionPlanPremiumFeature1": "Todo lo del plan Pro",
+  "subscriptionPlanPremiumFeature2": "50GB de almacenamiento",
+  "subscriptionPlanPremiumFeature3": "Vende contenido",
+  "subscriptionPlanPremiumFeature4": "Herramientas de equipo",
+  "supportScreenTitle": "Centro de Ayuda",
+  "supportHeading": "¿En qué podemos ayudarte?",
+  "supportSubtitle": "Encuentra respuestas o contacta a nuestro equipo.",
+  "supportSearchHint": "Buscar ayuda...",
+  "supportStatArticlesValue": "248",
+  "supportStatArticlesLabel": "Artículos",
+  "supportStatTicketsValue": "12",
+  "supportStatTicketsLabel": "Tickets",
+  "supportStatResponseValue": "<24 h",
+  "supportStatResponseLabel": "Respuesta",
+  "supportStatSupportValue": "24/7",
+  "supportStatSupportLabel": "Soporte",
+  "supportOptionFaqTitle": "Preguntas frecuentes",
+  "supportOptionFaqSubtitle": "Resuelve tus dudas rápidamente.",
+  "supportOptionContactTitle": "Contactar soporte",
+  "supportOptionContactSubtitle": "Habla directamente con nuestro equipo.",
+  "supportOptionReportBugTitle": "Reportar un error",
+  "supportOptionReportBugSubtitle": "Ayúdanos a mejorar Zentry.",
+  "supportOptionSuggestionTitle": "Enviar sugerencia",
+  "supportOptionSuggestionSubtitle": "Comparte tus ideas con nosotros.",
+  "supportOptionPrivacyTitle": "Política de privacidad",
+  "supportOptionPrivacySubtitle": "Conoce cómo protegemos tus datos.",
+  "supportOptionTermsTitle": "Términos y condiciones",
+  "supportOptionTermsSubtitle": "Información legal de la plataforma.",
+  "supportRecentTicketsTitle": "Tickets recientes",
+  "supportTicketStatusInReview": "En revisión",
+  "supportTicketStatusResolved": "Resuelto",
+  "supportEmptyTitle": "No encontramos resultados",
+  "supportEmptySubtitle": "Prueba con otra búsqueda o explora las opciones disponibles.",
+  "exploreSearchHint": "Buscar categorías o disciplinas...",
+  "exploreCategoriesTitle": "Categorías",
+  "exploreCategoriesSubtitle": "Explora todas las disciplinas creativas de Zentry",
+  "exploreSubcategoryCount": "{count} categorías",
+  "@exploreSubcategoryCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "exploreSearchResultsCount": "{count} resultados",
+  "@exploreSearchResultsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "exploreCreatorResultsCount": "{count} perfiles",
+  "@exploreCreatorResultsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "exploreNoSearchResults": "No encontramos categorías con ese nombre",
+  "searchScreenHint": "Buscar en Zentry...",
+  "searchTabAll": "Todos",
+  "searchTabUsers": "Usuarios",
+  "searchTabPosts": "Publicaciones",
+  "searchTabCommunities": "Comunidades",
+  "searchTabProjects": "Proyectos",
+  "searchTabCategories": "Categorías",
+  "searchSectionUsers": "Usuarios",
+  "searchSectionPosts": "Publicaciones",
+  "searchSectionCommunities": "Comunidades",
+  "searchSectionProjects": "Proyectos",
+  "searchSectionCategories": "Categorías",
+  "searchNoResults": "No encontramos resultados",
+  "searchEmptyHint": "Busca usuarios, publicaciones, comunidades, proyectos, categorías o #hashtags",
+  "categoryDetailSubcategoriesTitle": "Subcategorías",
+  "categoryDetailAllChip": "Todas",
+  "categoryDetailCreatorsInLabel": "Creadores en {subcategory}",
+  "@categoryDetailCreatorsInLabel": {
+    "placeholders": {
+      "subcategory": {
+        "type": "String"
+      }
+    }
+  },
+  "homeRolesNeededLabel": "Roles buscados",
+  "homeCollabPublicBadge": "Colaboración pública",
+  "homeCollabPrivateBadge": "Colaboración privada",
+  "homeFileSizeKb": "{size} KB",
+  "@homeFileSizeKb": {
+    "placeholders": {
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "notificationsScreenTitle": "Notificaciones",
+  "notificationsMarkAllRead": "Marcar todas como leídas",
+  "notificationsEmptyLabel": "No tienes notificaciones todavía",
+  "notificationsAchievementUnlockedTitle": "¡Logro desbloqueado!",
+  "notificationsAchievementUnlockedBody": "{title} · +{points} ZCoins",
+  "@notificationsAchievementUnlockedBody": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "points": {
+        "type": "int"
+      }
+    }
+  },
+  "notificationsChallengeClaimedTitle": "Reto completado",
+  "notificationsChallengeClaimedBody": "{title} · +{coins} ZCoins",
+  "@notificationsChallengeClaimedBody": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "coins": {
+        "type": "int"
+      }
+    }
+  },
+  "notificationsLikeTitle": "Nuevo like",
+  "notificationsLikeBody": "A alguien le gustó tu publicación: \"{preview}\"",
+  "@notificationsLikeBody": {
+    "placeholders": { "preview": { "type": "String" } }
+  },
+  "notificationsCommentTitle": "Nuevo comentario",
+  "notificationsCommentBody": "{actor} comentó: \"{comment}\"",
+  "@notificationsCommentBody": {
+    "placeholders": {
+      "actor": { "type": "String" },
+      "comment": { "type": "String" }
+    }
+  },
+  "notificationsFollowTitle": "Nuevo seguidor",
+  "notificationsFollowBody": "{actor} empezó a seguirte",
+  "@notificationsFollowBody": {
+    "placeholders": { "actor": { "type": "String" } }
+  },
+  "notificationsCommunityJoinRequestTitle": "Solicitud para unirse",
+  "notificationsCommunityJoinRequestBody": "{actor} quiere unirse a {community}",
+  "@notificationsCommunityJoinRequestBody": {
+    "placeholders": {
+      "actor": { "type": "String" },
+      "community": { "type": "String" }
+    }
+  },
+  "notificationsCommunityRequestApprovedTitle": "Solicitud aceptada",
+  "notificationsCommunityRequestApprovedBody": "Tu solicitud para unirte a {community} fue aceptada",
+  "@notificationsCommunityRequestApprovedBody": {
+    "placeholders": { "community": { "type": "String" } }
+  },
+  "notificationsCommunityRequestRejectedTitle": "Solicitud rechazada",
+  "notificationsCommunityRequestRejectedBody": "Tu solicitud para unirte a {community} fue rechazada",
+  "@notificationsCommunityRequestRejectedBody": {
+    "placeholders": { "community": { "type": "String" } }
+  },
+  "notificationsCommunityNewPostTitle": "Nueva publicación",
+  "notificationsCommunityNewPostBody": "Hay una nueva publicación en {community}",
+  "@notificationsCommunityNewPostBody": {
+    "placeholders": { "community": { "type": "String" } }
+  },
+  "notificationsMentionTitle": "Te mencionaron",
+  "notificationsMentionBody": "{actor} te mencionó: \"{preview}\"",
+  "@notificationsMentionBody": {
+    "placeholders": {
+      "actor": { "type": "String" },
+      "preview": { "type": "String" }
+    }
+  },
+  "notificationsCollaborationRequestTitle": "Solicitud de colaboración",
+  "notificationsCollaborationRequestBody": "{actor} quiere colaborar en \"{title}\"",
+  "@notificationsCollaborationRequestBody": {
+    "placeholders": {
+      "actor": { "type": "String" },
+      "title": { "type": "String" }
+    }
+  },
+  "notificationsCollaborationAcceptedTitle": "Colaboración aceptada",
+  "notificationsCollaborationAcceptedBody": "Te aceptaron para colaborar en \"{title}\"",
+  "@notificationsCollaborationAcceptedBody": {
+    "placeholders": { "title": { "type": "String" } }
+  },
+  "notificationsFilterAll": "Todas",
+  "notificationsFilterAchievements": "Logros",
+  "notificationsFilterSocial": "Social",
+  "notificationsFilterCommunity": "Comunidad",
+  "notificationsFilterCollaboration": "Colaboración",
+  "ranksScreenTitle": "Rangos",
+  "ranksScreenSubtitle": "Sube de rango acumulando puntos de logros y racha",
+  "ranksScreenCountLabel": "{count} rangos disponibles",
+  "@ranksScreenCountLabel": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "ranksMinPointsLabel": "Desde {points} puntos",
+  "@ranksMinPointsLabel": {
+    "placeholders": {
+      "points": {
+        "type": "int"
+      }
+    }
+  },
+  "ranksCurrentBadge": "Tu rango actual",
+  "ranksNextRankTitle": "Progreso al siguiente rango",
+  "ranksPointsToNextLabel": "{points} puntos para {rank}",
+  "@ranksPointsToNextLabel": {
+    "placeholders": {
+      "points": {
+        "type": "int"
+      },
+      "rank": {
+        "type": "String"
+      }
+    }
+  },
+  "ranksMaxRankLabel": "¡Alcanzaste el rango máximo!",
+  "ranksExportPdfButton": "Exportar progreso en PDF",
+  "ranksPerkLabel": "Beneficio",
+  "ranksPerkBronze": "Acceso a retos básicos y a la tienda de la comunidad",
+  "ranksPerkSilver": "Marco de perfil plateado y prioridad en soporte",
+  "ranksPerkGold": "Insignia dorada visible en tu perfil y comentarios",
+  "ranksPerkPlatinum": "Destacado en el explorador de creadores",
+  "ranksPerkDiamond": "Acceso anticipado a eventos y colaboraciones exclusivas",
+  "ranksPerkMaster": "Marco animado exclusivo y mención en la comunidad destacada",
+  "ranksExportPdfSuccess": "PDF guardado y abierto",
+  "ranksExportPdfError": "No se pudo generar el PDF",
+  "pdfDocTitle": "Constancia de progreso Zentry",
+  "pdfDocGeneratedOn": "Generado el {date}",
+  "@pdfDocGeneratedOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "pdfDocRankLabel": "Rango actual: {rank}",
+  "@pdfDocRankLabel": {
+    "placeholders": {
+      "rank": {
+        "type": "String"
+      }
+    }
+  },
+  "pdfDocPointsLabel": "Puntos totales: {points}",
+  "@pdfDocPointsLabel": {
+    "placeholders": {
+      "points": {
+        "type": "int"
+      }
+    }
+  },
+  "pdfDocAchievementsTitle": "Logros desbloqueados",
+  "pdfDocNoAchievements": "Aún no has desbloqueado logros",
+  "pdfDocStreakLabel": "Racha actual: {days} días (mejor racha: {best})",
+  "@pdfDocStreakLabel": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      },
+      "best": {
+        "type": "int"
+      }
+    }
+  }
+}

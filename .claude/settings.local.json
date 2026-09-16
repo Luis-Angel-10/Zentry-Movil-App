@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cd \"c:/Users/Destr/OneDrive/Escritorio/back/zentry/src/main/java/zentry/back/api/realtime/service\" && echo \"===== MessageService.java =====\" && cat MessageService.java)",
+      "Read(//c/Users/Destr/OneDrive/Escritorio/back/zentry/src/main/java/zentry/back/api/realtime/service/**)"
+    ]
+  }
+}
