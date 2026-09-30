@@ -5,8 +5,8 @@ import 'package:provider/provider.dart';
 
 import 'package:Zentry/core/providers/auth_controller.dart';
 import 'package:Zentry/core/providers/engagement_controller.dart';
-import 'package:Zentry/core/providers/follow_controller.dart';
 import 'package:Zentry/core/providers/posts_controller.dart';
+import 'package:Zentry/core/widgets/zentry_network_image.dart';
 import 'package:Zentry/l10n/generated/app_localizations.dart';
 
 const List<String> _kDayLetters = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
@@ -20,7 +20,6 @@ class ProfileStatsScreen extends StatelessWidget {
     final engagement = context.watch<EngagementController>();
     final user = context.watch<AuthController>().currentUser;
     final postsController = context.watch<PostsController>();
-    final follow = context.watch<FollowController>();
 
     final myPosts = user == null
         ? const <Map<String, dynamic>>[]
@@ -33,7 +32,10 @@ class ProfileStatsScreen extends StatelessWidget {
       0,
       (sum, p) => sum + ((p["comments"] as List?)?.length ?? 0),
     );
-    final followersCount = user == null ? 0 : follow.followersCount(user.id);
+    // Backend real, no el grafo local de FollowController (ese es sólo para
+    // la visibilidad de historias mock, un dominio distinto).
+    final followersCount =
+        context.watch<AuthController>().backendProfile?.followersCount ?? 0;
 
     Map<String, dynamic>? topPost;
     for (final p in myPosts) {
@@ -237,7 +239,7 @@ class ProfileStatsScreen extends StatelessWidget {
                       ),
                     )
                   : imageUrl != null
-                  ? Image.network(imageUrl, fit: BoxFit.cover)
+                  ? ZentryNetworkImage(imageUrl: imageUrl, fit: BoxFit.cover)
                   : Container(
                       color: Colors.white10,
                       child: const Icon(Icons.notes, color: Colors.white24),

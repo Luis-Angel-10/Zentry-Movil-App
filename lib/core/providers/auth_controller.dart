@@ -11,6 +11,7 @@ import 'package:Zentry/core/network/realtime_client.dart';
 import 'package:Zentry/core/network/token_storage.dart';
 import 'package:Zentry/core/services/auth_repository.dart';
 import 'package:Zentry/core/services/biometric_service.dart';
+import 'package:Zentry/core/services/fcm_service.dart';
 
 /// Controlador de autenticación. Desde la integración con el backend Zentry
 /// (Spring Boot) la sesión se basa en un JWT guardado en almacenamiento seguro:
@@ -57,6 +58,34 @@ class AuthController extends ChangeNotifier {
   AppUser? biometricUser;
 
   bool get isLoggedIn => currentUser != null;
+
+  /// Se dispara al FINAL de [_establishSession] (login real y verificación
+  /// de OTP tras registro) — es decir, cuando una sesión nueva se establece
+  /// DENTRO de la ejecución actual de la app (no al reiniciarla).
+  ///
+  /// Existe porque varios controllers (`StreakController`, `WalletController`)
+  /// sólo se cargaban una vez, en `main.dart`, al arrancar el proceso — si en
+  /// ese momento todavía no había sesión (usuario recién abre la app y aún no
+  /// ha iniciado sesión), esa carga fallaba por falta de token y nunca se
+  /// repetía. Por eso la racha/saldo aparecían en 0 hasta cerrar y reabrir la
+  /// app (momento en que el token ya existía desde el arranque). Login
+  /// biométrico no necesita este hook: sólo es posible cuando el token ya
+  /// existía desde el arranque, así que esas cargas ya tuvieron éxito.
+  VoidCallback? onSessionEstablished;
+
+  /// Se dispara al FINAL de [_wipeSession] (logout real o sesión invalidada
+  /// por 401/403) — corrección: `StreakController` (y otros controllers con
+  /// estado "del usuario actual" que main.dart sólo carga una vez al
+  /// arrancar) vivían como singletons durante toda la vida del proceso y
+  /// nunca se limpiaban en logout. Si el usuario A cerraba sesión e iniciaba
+  /// sesión el usuario B en la MISMA ejecución de la app (sin reiniciarla),
+  /// la UI podía mostrar brevemente la racha de A hasta que la respuesta de
+  /// `GET /api/core/streaks/me` para B llegara — o, si esa petición fallaba,
+  /// quedarse indefinidamente con el valor de A (el controller conserva el
+  /// último valor conocido ante errores de red, asumiendo que sigue siendo
+  /// el mismo usuario). Con este hook, main.dart limpia ese estado ANTES de
+  /// que pueda quedar visible.
+  VoidCallback? onSessionCleared;
 
   // ─────────────────────────────────────────────────────────────────────────
   // Arranque / restauración de sesión
@@ -229,6 +258,54 @@ class AuthController extends ChangeNotifier {
   }
 
   // ─────────────────────────────────────────────────────────────────────────
+  // Recuperación de contraseña (forgot / reset password)
+  // ─────────────────────────────────────────────────────────────────────────
+
+  /// `POST /api/auth/forgot-password`. Envía un código OTP de 6 dígitos al
+  /// correo si existe una cuenta asociada.
+  Future<AuthFailure?> forgotPassword(String email) async {
+    isLoading = true;
+    notifyListeners();
+    try {
+      await _authApi.forgotPassword(email: email);
+      return null;
+    } on ApiException catch (e) {
+      return _mapAuthError(e);
+    } finally {
+      isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  /// `POST /api/auth/reset-password`. Verifica el código y establece la
+  /// nueva contraseña en una sola llamada. No inicia sesión: el usuario debe
+  /// volver a loguearse con la contraseña nueva.
+  Future<AuthFailure?> resetPassword({
+    required String email,
+    required String code,
+    required String newPassword,
+  }) async {
+    isLoading = true;
+    notifyListeners();
+    try {
+      await _authApi.resetPassword(
+        email: email,
+        code: code,
+        newPassword: newPassword,
+      );
+      return null;
+    } on ApiException catch (e) {
+      if (e.isValidation && e.fieldErrors.containsKey('newPassword')) {
+        return AuthFailure.weakPassword;
+      }
+      return _mapAuthError(e);
+    } finally {
+      isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────
   // Biometría (desbloqueo rápido; requiere token válido en almacenamiento)
   // ─────────────────────────────────────────────────────────────────────────
 
@@ -328,10 +405,12 @@ class AuthController extends ChangeNotifier {
     biometricUser = null;
     sessionExpired = markExpired;
     RealtimeClient.instance.disconnect();
+    await FcmService.instance.onLogout();
     await _tokens.clear();
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_biometricEnabledKey);
     await prefs.remove(_biometricUserIdKey);
+    onSessionCleared?.call();
     notifyListeners();
   }
 
@@ -492,6 +571,8 @@ class AuthController extends ChangeNotifier {
         );
       }
     }
+
+    onSessionEstablished?.call();
   }
 
   Future<void> _applyProfile(

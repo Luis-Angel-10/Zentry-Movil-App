@@ -1,11 +1,24 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:Zentry/core/providers/posts_controller.dart';
-import 'package:Zentry/l10n/generated/app_localizations.dart';
-import 'package:Zentry/theme/theme_controller.dart';
 
+import 'package:Zentry/core/models/backend/post_response.dart';
+import 'package:Zentry/core/network/api_exception.dart';
+import 'package:Zentry/core/providers/auth_controller.dart';
+import 'package:Zentry/core/providers/posts_controller.dart';
+import 'package:Zentry/core/widgets/zentry_network_image.dart';
+import 'package:Zentry/features/home/widgets/backend_feed.dart';
+import 'package:Zentry/l10n/generated/app_localizations.dart';
+
+/// Publicaciones guardadas — datos REALES de
+/// `GET /api/core/posts/saved/{username}`.
+///
+/// CORRECCIÓN: la versión anterior de esta pantalla era, en su mayoría, una
+/// función de "colecciones/carpetas" (Favoritos, Inspiración, UI/UX...) con
+/// contadores y tamaños de almacenamiento ("128", "2.8 GB") 100% inventados
+/// — el backend no tiene ningún concepto de colección para guardados
+/// (`Bookmark` es sólo `id/userId/postId`, confirmado por lectura del
+/// backend). Se reemplazó por una cuadrícula real de posts guardados, igual
+/// que Likes, sin simular una función que no existe.
 class SavedScreen extends StatefulWidget {
   const SavedScreen({super.key});
 
@@ -13,1005 +26,332 @@ class SavedScreen extends StatefulWidget {
   State<SavedScreen> createState() => _SavedScreenState();
 }
 
-class _SavedScreenState extends State<SavedScreen>
-    with TickerProviderStateMixin {
-  late AnimationController animationController;
-
-  final ScrollController scrollController = ScrollController();
-
+class _SavedScreenState extends State<SavedScreen> {
   final TextEditingController searchController = TextEditingController();
-
   bool searching = false;
-
-  List<Map<String, dynamic>> collections = [
-    {
-      "name": "Favoritos",
-
-      "posts": 128,
-
-      "icon": Icons.favorite,
-
-      "color": Colors.red,
-
-      "cover": "assets/inicio.png",
-    },
-
-    {
-      "name": "Inspiración",
-
-      "posts": 56,
-
-      "icon": Icons.lightbulb,
-
-      "color": Colors.orange,
-
-      "cover": "assets/login.png",
-    },
-
-    {
-      "name": "UI / UX",
-
-      "posts": 34,
-
-      "icon": Icons.design_services,
-
-      "color": Colors.blue,
-
-      "cover": "assets/inicio.png",
-    },
-
-    {
-      "name": "Música",
-
-      "posts": 22,
-
-      "icon": Icons.music_note,
-
-      "color": Colors.purple,
-
-      "cover": "assets/login.png",
-    },
-
-    {
-      "name": "Videojuegos",
-
-      "posts": 41,
-
-      "icon": Icons.sports_esports,
-
-      "color": Colors.green,
-
-      "cover": "assets/inicio.png",
-    },
-
-    {
-      "name": "Literatura",
-
-      "posts": 18,
-
-      "icon": Icons.menu_book,
-
-      "color": Colors.teal,
-
-      "cover": "assets/login.png",
-    },
-  ];
-
-  late List<Map<String, dynamic>> filteredCollections;
 
   @override
   void initState() {
     super.initState();
-
-    filteredCollections = List.from(collections);
-
-    animationController = AnimationController(
-      vsync: this,
-
-      duration: const Duration(milliseconds: 700),
-    );
-
-    animationController.forward();
-
-    searchController.addListener(filterCollections);
+    searchController.addListener(() => setState(() {}));
+    WidgetsBinding.instance.addPostFrameCallback((_) => _load());
   }
 
   @override
   void dispose() {
-    animationController.dispose();
-
     searchController.dispose();
-
-    scrollController.dispose();
-
     super.dispose();
   }
 
-  void filterCollections() {
-    String query = searchController.text.toLowerCase();
-
-    setState(() {
-      filteredCollections = collections.where((collection) {
-        return collection["name"].toLowerCase().contains(query);
-      }).toList();
-    });
+  Future<void> _load() async {
+    if (!mounted) return;
+    final username = context.read<AuthController>().currentUser?.username;
+    if (username == null) return;
+    await context.read<PostsController>().loadSavedPosts(username);
   }
 
-  Future<void> refresh() async {
-    await Future.delayed(const Duration(seconds: 1));
-
-    filterCollections();
+  List<PostResponse> _applySearch(List<PostResponse> posts) {
+    final query = searchController.text.trim().toLowerCase();
+    if (query.isEmpty) return posts;
+    return posts.where((p) {
+      final haystack =
+          '${p.title ?? ''} ${p.content ?? ''} ${p.authorName ?? ''} ${p.authorUsername ?? ''}'
+              .toLowerCase();
+      return haystack.contains(query);
+    }).toList();
   }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final accentColor = context.watch<ThemeController>().accentColor;
-    final savedPosts = context
-        .watch<PostsController>()
-        .posts
-        .where((p) => p["saved"] == true)
-        .toList();
+    final controller = context.watch<PostsController>();
+    final filtered = _applySearch(controller.savedBackendPosts);
+
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
-
         title: Text(
           l10n.savedScreenTitle,
-
           style: const TextStyle(fontWeight: FontWeight.bold),
         ),
-
         actions: [
           IconButton(
-            onPressed: () {
-              setState(() {
-                searching = !searching;
-              });
-            },
-
+            onPressed: () => setState(() => searching = !searching),
             icon: Icon(searching ? Icons.close : Icons.search),
-          ),
-
-          IconButton(
-            onPressed: () {},
-
-            icon: const Icon(Icons.add_box_outlined),
           ),
         ],
       ),
       body: RefreshIndicator(
-        onRefresh: refresh,
-
+        onRefresh: _load,
         child: ListView(
-          controller: scrollController,
-
           padding: const EdgeInsets.all(18),
-
           children: [
-            FadeTransition(
-              opacity: animationController,
-
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-
-                children: [
-                  Text(
-                    l10n.savedCollectionsHeading,
-
-                    style: const TextStyle(
-                      color: Colors.white,
-
-                      fontSize: 28,
-
-                      fontWeight: FontWeight.bold,
-                    ),
+            Text(
+              l10n.savedScreenTitle,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              l10n.savedPostsSectionTitle,
+              style: TextStyle(color: Colors.grey.shade500, fontSize: 14),
+            ),
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 300),
+              height: searching ? 65 : 0,
+              margin: EdgeInsets.only(top: searching ? 25 : 0),
+              child: TextField(
+                controller: searchController,
+                style: const TextStyle(color: Colors.white),
+                decoration: InputDecoration(
+                  filled: true,
+                  fillColor: const Color(0xff171725),
+                  hintText: l10n.savedSearchHint,
+                  hintStyle: TextStyle(color: Colors.grey.shade500),
+                  prefixIcon: const Icon(Icons.search, color: Colors.white70),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(18),
+                    borderSide: BorderSide.none,
                   ),
-
-                  const SizedBox(height: 8),
-
-                  Text(
-                    l10n.savedCollectionsSubtitle,
-
-                    style: TextStyle(color: Colors.grey.shade500, fontSize: 14),
+                ),
+              ),
+            ),
+            const SizedBox(height: 25),
+            if (controller.savedPostsLoading && !controller.savedPostsLoaded)
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 60),
+                child: Center(child: CircularProgressIndicator()),
+              )
+            else if (controller.savedPostsError != null &&
+                controller.savedBackendPosts.isEmpty)
+              _errorState(controller.savedPostsError!, l10n)
+            else if (filtered.isEmpty)
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(18),
+                decoration: BoxDecoration(
+                  color: const Color(0xff171725),
+                  borderRadius: BorderRadius.circular(18),
+                ),
+                child: Text(
+                  l10n.savedPostsEmptyHint,
+                  style: TextStyle(
+                    color: Colors.grey.shade500,
+                    fontSize: 13,
+                    height: 1.4,
                   ),
+                ),
+              )
+            else
+              GridView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: filtered.length,
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  crossAxisSpacing: 15,
+                  mainAxisSpacing: 15,
+                  childAspectRatio: .72,
+                ),
+                itemBuilder: (_, index) =>
+                    _SavedPostCard(post: filtered[index]),
+              ),
+            const SizedBox(height: 30),
+          ],
+        ),
+      ),
+    );
+  }
 
-                  const SizedBox(height: 25),
+  Widget _errorState(String message, AppLocalizations l10n) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 60),
+      child: Center(
+        child: Column(
+          children: [
+            Icon(Icons.error_outline, color: Colors.grey.shade700, size: 48),
+            const SizedBox(height: 12),
+            Text(
+              message,
+              textAlign: TextAlign.center,
+              style: TextStyle(color: Colors.grey.shade500),
+            ),
+            const SizedBox(height: 12),
+            OutlinedButton(onPressed: _load, child: Text(l10n.commonRetry)),
+          ],
+        ),
+      ),
+    );
+  }
+}
 
-                  Text(
-                    l10n.savedPostsSectionTitle,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+class _SavedPostCard extends StatelessWidget {
+  const _SavedPostCard({required this.post});
+  final PostResponse post;
 
-                  const SizedBox(height: 12),
+  @override
+  Widget build(BuildContext context) {
+    final imageUrl = post.imageUrlAbsolute;
+    final isVideo = post.contentType == 'video';
 
-                  if (savedPosts.isEmpty)
-                    Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.all(18),
-                      decoration: BoxDecoration(
-                        color: const Color(0xff171725),
-                        borderRadius: BorderRadius.circular(18),
+    return GestureDetector(
+      onTap: () => _openPost(context),
+      child: Container(
+        decoration: BoxDecoration(
+          color: const Color(0xff171725),
+          borderRadius: BorderRadius.circular(22),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: .30),
+              blurRadius: 15,
+              offset: const Offset(0, 8),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              flex: 7,
+              child: ClipRRect(
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(22),
+                  topRight: Radius.circular(22),
+                ),
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    if (imageUrl != null)
+                      ZentryNetworkImage(imageUrl: imageUrl, fit: BoxFit.cover)
+                    else
+                      Container(
+                        decoration: const BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [Color(0xFF8B5CF6), Color(0xFFD946EF)],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                        ),
+                        child: const Center(
+                          child: Icon(
+                            Icons.bookmark_outline,
+                            color: Colors.white24,
+                            size: 48,
+                          ),
+                        ),
                       ),
+                    if (isVideo)
+                      const Positioned(
+                        right: 10,
+                        bottom: 10,
+                        child: Icon(
+                          Icons.play_circle_fill,
+                          color: Colors.white,
+                          size: 26,
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            ),
+            Expanded(
+              flex: 3,
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      (post.title?.isNotEmpty ?? false)
+                          ? post.title!
+                          : (post.content ?? ''),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    GestureDetector(
+                      onTap: () => openAuthorProfile(context, post),
                       child: Text(
-                        l10n.savedPostsEmptyHint,
+                        post.authorName ?? post.authorUsername ?? '',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         style: TextStyle(
-                          color: Colors.grey.shade500,
-                          fontSize: 13,
-                          height: 1.4,
+                          color: Colors.grey.shade400,
+                          fontSize: 12,
                         ),
                       ),
-                    )
-                  else
-                    GridView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: savedPosts.length,
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 3,
-                            crossAxisSpacing: 6,
-                            mainAxisSpacing: 6,
-                          ),
-                      itemBuilder: (_, index) {
-                        final post = savedPosts[index];
-                        final imageFile = post["imageFile"] as File?;
-                        final imageUrl = post["image"] as String?;
-                        final isVideo = post["videoFile"] != null;
-
-                        return ClipRRect(
-                          borderRadius: BorderRadius.circular(12),
-                          child: Stack(
-                            fit: StackFit.expand,
-                            children: [
-                              if (imageFile != null)
-                                Image.file(
-                                  imageFile,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (_, __, ___) => Container(
-                                    decoration: const BoxDecoration(
-                                      gradient: LinearGradient(
-                                        begin: Alignment.topLeft,
-                                        end: Alignment.bottomRight,
-                                        colors: [
-                                          Color(0xFF8B5CF6),
-                                          Color(0xFFD946EF),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                )
-                              else if (imageUrl != null)
-                                Image.network(imageUrl, fit: BoxFit.cover)
-                              else
-                                Container(
-                                  decoration: const BoxDecoration(
-                                    gradient: LinearGradient(
-                                      begin: Alignment.topLeft,
-                                      end: Alignment.bottomRight,
-                                      colors: [
-                                        Color(0xFF8B5CF6),
-                                        Color(0xFFD946EF),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              if (isVideo)
-                                const Positioned(
-                                  right: 6,
-                                  bottom: 6,
-                                  child: Icon(
-                                    Icons.play_circle_fill,
-                                    color: Colors.white,
-                                    size: 20,
-                                  ),
-                                ),
-                            ],
-                          ),
-                        );
-                      },
                     ),
-
-                  const SizedBox(height: 30),
-
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _statCard(
-                          Icons.folder_copy,
-
-                          Colors.blue,
-
-                          collections.length.toString(),
-
-                          l10n.savedCollectionsStatLabel,
-                        ),
-                      ),
-
-                      const SizedBox(width: 12),
-
-                      Expanded(
-                        child: _statCard(
-                          Icons.bookmark,
-
-                          Colors.amber,
-
-                          collections
-                              .fold<int>(
-                                0,
-                                (total, item) => total + (item["posts"] as int),
-                              )
-                              .toString(),
-
-                          l10n.savedScreenTitle,
-                        ),
-                      ),
-                    ],
-                  ),
-
-                  const SizedBox(height: 12),
-
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _statCard(
+                    const Spacer(),
+                    Row(
+                      children: [
+                        Icon(
                           Icons.favorite,
-
-                          Colors.red,
-
-                          "128",
-
-                          l10n.savedFavoritesStatLabel,
+                          color: Colors.red.shade400,
+                          size: 16,
                         ),
-                      ),
-
-                      const SizedBox(width: 12),
-
-                      Expanded(
-                        child: _statCard(
-                          Icons.storage,
-
-                          Colors.green,
-
-                          "2.8 GB",
-
-                          l10n.savedStorageStatLabel,
-                        ),
-                      ),
-                    ],
-                  ),
-
-                  AnimatedContainer(
-                    duration: const Duration(milliseconds: 300),
-
-                    height: searching ? 65 : 0,
-
-                    margin: EdgeInsets.only(top: searching ? 25 : 0),
-
-                    child: TextField(
-                      controller: searchController,
-
-                      style: const TextStyle(color: Colors.white),
-
-                      decoration: InputDecoration(
-                        filled: true,
-
-                        fillColor: const Color(0xff171725),
-
-                        hintText: l10n.savedSearchHint,
-
-                        hintStyle: TextStyle(color: Colors.grey.shade500),
-
-                        prefixIcon: const Icon(
-                          Icons.search,
-
-                          color: Colors.white70,
-                        ),
-
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(18),
-
-                          borderSide: BorderSide.none,
-                        ),
-                      ),
-                    ),
-                  ),
-
-                  const SizedBox(height: 25),
-
-                  SizedBox(
-                    width: double.infinity,
-
-                    height: 55,
-
-                    child: ElevatedButton.icon(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: accentColor,
-
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(18),
-                        ),
-                      ),
-
-                      onPressed: () {
-                        showDialog(
-                          context: context,
-
-                          builder: (_) {
-                            final controller = TextEditingController();
-
-                            return AlertDialog(
-                              backgroundColor: const Color(0xff171725),
-
-                              title: Text(
-                                l10n.savedNewCollectionLabel,
-
-                                style: const TextStyle(color: Colors.white),
-                              ),
-
-                              content: TextField(
-                                controller: controller,
-
-                                style: const TextStyle(color: Colors.white),
-
-                                decoration: InputDecoration(
-                                  hintText: l10n.savedCollectionNameHint,
-                                ),
-                              ),
-
-                              actions: [
-                                TextButton(
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                  },
-
-                                  child: Text(l10n.commonCancel),
-                                ),
-
-                                FilledButton(
-                                  onPressed: () {
-                                    if (controller.text.trim().isNotEmpty) {
-                                      setState(() {
-                                        collections.add({
-                                          "name": controller.text,
-
-                                          "posts": 0,
-
-                                          "icon": Icons.folder,
-
-                                          "color": accentColor,
-
-                                          "cover": "assets/inicio.png",
-                                        });
-
-                                        filterCollections();
-                                      });
-                                    }
-
-                                    Navigator.pop(context);
-                                  },
-
-                                  child: Text(l10n.savedCreateButton),
-                                ),
-                              ],
-                            );
-                          },
-                        );
-                      },
-
-                      icon: const Icon(Icons.add),
-
-                      label: Text(l10n.savedNewCollectionLabel),
-                    ),
-                  ),
-
-                  const SizedBox(height: 30),
-                  if (filteredCollections.isEmpty)
-                    _emptyState(l10n, accentColor)
-                  else
-                    GridView.builder(
-                      shrinkWrap: true,
-
-                      physics: const NeverScrollableScrollPhysics(),
-
-                      itemCount: filteredCollections.length,
-
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
-
-                            crossAxisSpacing: 16,
-
-                            mainAxisSpacing: 16,
-
-                            childAspectRatio: .82,
+                        const SizedBox(width: 4),
+                        Text(
+                          '${post.likesCount}',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12,
                           ),
-
-                      itemBuilder: (_, index) {
-                        final collection = filteredCollections[index];
-
-                        return TweenAnimationBuilder<double>(
-                          duration: Duration(milliseconds: 250 + (index * 80)),
-
-                          tween: Tween(begin: .90, end: 1),
-
-                          curve: Curves.easeOutBack,
-
-                          builder: (_, value, child) {
-                            return Transform.scale(scale: value, child: child);
-                          },
-
-                          child: GestureDetector(
-                            onTap: () {},
-
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: const Color(0xff171725),
-
-                                borderRadius: BorderRadius.circular(22),
-
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(.25),
-
-                                    blurRadius: 15,
-
-                                    offset: const Offset(0, 8),
-                                  ),
-                                ],
-                              ),
-
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-
-                                children: [
-                                  Expanded(
-                                    flex: 7,
-
-                                    child: Hero(
-                                      tag: "collection_$index",
-
-                                      child: ClipRRect(
-                                        borderRadius: const BorderRadius.only(
-                                          topLeft: Radius.circular(22),
-
-                                          topRight: Radius.circular(22),
-                                        ),
-
-                                        child: Stack(
-                                          children: [
-                                            Positioned.fill(
-                                              child: Image.asset(
-                                                collection["cover"],
-
-                                                fit: BoxFit.cover,
-                                              ),
-                                            ),
-
-                                            Positioned(
-                                              top: 10,
-
-                                              right: 10,
-
-                                              child: InkWell(
-                                                borderRadius:
-                                                    BorderRadius.circular(30),
-
-                                                onTap: () {
-                                                  showModalBottomSheet(
-                                                    context: context,
-
-                                                    backgroundColor:
-                                                        const Color(0xff171725),
-
-                                                    shape: const RoundedRectangleBorder(
-                                                      borderRadius:
-                                                          BorderRadius.vertical(
-                                                            top:
-                                                                Radius.circular(
-                                                                  25,
-                                                                ),
-                                                          ),
-                                                    ),
-
-                                                    builder: (_) {
-                                                      return SafeArea(
-                                                        child: Column(
-                                                          mainAxisSize:
-                                                              MainAxisSize.min,
-
-                                                          children: [
-                                                            const SizedBox(
-                                                              height: 20,
-                                                            ),
-
-                                                            ListTile(
-                                                              leading:
-                                                                  const Icon(
-                                                                    Icons.edit,
-
-                                                                    color: Colors
-                                                                        .white,
-                                                                  ),
-
-                                                              title: Text(
-                                                                l10n.savedRenameOption,
-
-                                                                style: const TextStyle(
-                                                                  color: Colors
-                                                                      .white,
-                                                                ),
-                                                              ),
-
-                                                              onTap: () {
-                                                                Navigator.pop(
-                                                                  context,
-                                                                );
-                                                              },
-                                                            ),
-
-                                                            ListTile(
-                                                              leading:
-                                                                  const Icon(
-                                                                    Icons.share,
-
-                                                                    color: Colors
-                                                                        .white,
-                                                                  ),
-
-                                                              title: Text(
-                                                                l10n.commonShare,
-
-                                                                style: const TextStyle(
-                                                                  color: Colors
-                                                                      .white,
-                                                                ),
-                                                              ),
-
-                                                              onTap: () {
-                                                                Navigator.pop(
-                                                                  context,
-                                                                );
-                                                              },
-                                                            ),
-
-                                                            ListTile(
-                                                              leading:
-                                                                  const Icon(
-                                                                    Icons
-                                                                        .delete,
-
-                                                                    color: Colors
-                                                                        .red,
-                                                                  ),
-
-                                                              title: Text(
-                                                                l10n.commonDelete,
-
-                                                                style: const TextStyle(
-                                                                  color: Colors
-                                                                      .white,
-                                                                ),
-                                                              ),
-
-                                                              onTap: () {
-                                                                setState(() {
-                                                                  collections
-                                                                      .remove(
-                                                                        collection,
-                                                                      );
-
-                                                                  filterCollections();
-                                                                });
-
-                                                                Navigator.pop(
-                                                                  context,
-                                                                );
-                                                              },
-                                                            ),
-
-                                                            const SizedBox(
-                                                              height: 15,
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      );
-                                                    },
-                                                  );
-                                                },
-
-                                                child: Container(
-                                                  padding: const EdgeInsets.all(
-                                                    8,
-                                                  ),
-
-                                                  decoration: BoxDecoration(
-                                                    color: Colors.black54,
-
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                          30,
-                                                        ),
-                                                  ),
-
-                                                  child: const Icon(
-                                                    Icons.more_vert,
-
-                                                    color: Colors.white,
-
-                                                    size: 18,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-
-                                            Positioned(
-                                              left: 10,
-
-                                              bottom: 10,
-
-                                              child: Container(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                      horizontal: 12,
-
-                                                      vertical: 6,
-                                                    ),
-
-                                                decoration: BoxDecoration(
-                                                  color: collection["color"],
-
-                                                  borderRadius:
-                                                      BorderRadius.circular(30),
-                                                ),
-
-                                                child: Row(
-                                                  children: [
-                                                    Icon(
-                                                      collection["icon"],
-
-                                                      color: Colors.white,
-
-                                                      size: 15,
-                                                    ),
-
-                                                    const SizedBox(width: 5),
-
-                                                    Text(
-                                                      "${collection["posts"]}",
-
-                                                      style: const TextStyle(
-                                                        color: Colors.white,
-
-                                                        fontWeight:
-                                                            FontWeight.bold,
-
-                                                        fontSize: 11,
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  Expanded(
-                                    flex: 3,
-
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(12),
-
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-
-                                        children: [
-                                          Text(
-                                            collection["name"],
-
-                                            maxLines: 1,
-
-                                            overflow: TextOverflow.ellipsis,
-
-                                            style: const TextStyle(
-                                              color: Colors.white,
-
-                                              fontWeight: FontWeight.bold,
-
-                                              fontSize: 16,
-                                            ),
-                                          ),
-
-                                          const SizedBox(height: 6),
-
-                                          Text(
-                                            l10n.savedPostsCountLabel(
-                                              collection["posts"] as int,
-                                            ),
-
-                                            style: TextStyle(
-                                              color: Colors.grey.shade400,
-
-                                              fontSize: 13,
-                                            ),
-                                          ),
-
-                                          const Spacer(),
-
-                                          Row(
-                                            children: [
-                                              Icon(
-                                                collection["icon"],
-
-                                                color: collection["color"],
-
-                                                size: 20,
-                                              ),
-
-                                              const Spacer(),
-
-                                              Container(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                      horizontal: 10,
-
-                                                      vertical: 5,
-                                                    ),
-
-                                                decoration: BoxDecoration(
-                                                  color: Colors.white
-                                                      .withOpacity(.06),
-
-                                                  borderRadius:
-                                                      BorderRadius.circular(20),
-                                                ),
-
-                                                child: Text(
-                                                  l10n.savedOpenButton,
-
-                                                  style: const TextStyle(
-                                                    color: Colors.white,
-
-                                                    fontWeight: FontWeight.w600,
-
-                                                    fontSize: 11,
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
+                        ),
+                        const Spacer(),
+                        // Desguardar aquí actualiza la UI de inmediato
+                        // (Sección 12): `toggleBookmarkBackend` quita este
+                        // post de `savedBackendPosts` en cuanto el backend
+                        // confirma, sin esperar a un refresh manual.
+                        GestureDetector(
+                          onTap: () => _unsave(context),
+                          child: const Icon(
+                            Icons.bookmark,
+                            color: Colors.amber,
+                            size: 18,
                           ),
-                        );
-                      },
+                        ),
+                      ],
                     ),
-
-                  const SizedBox(height: 30),
-                ],
+                  ],
+                ),
               ),
             ),
           ],
         ),
       ),
-
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: accentColor,
-
-        elevation: 8,
-
-        onPressed: () {
-          scrollController.animateTo(
-            0,
-
-            duration: const Duration(milliseconds: 500),
-
-            curve: Curves.easeOut,
-          );
-        },
-
-        child: const Icon(Icons.keyboard_arrow_up),
-      ),
     );
   }
 
-  Widget _statCard(IconData icon, Color color, String value, String title) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 18),
-
-      decoration: BoxDecoration(
-        color: const Color(0xff171725),
-
-        borderRadius: BorderRadius.circular(20),
-      ),
-
-      child: Column(
-        children: [
-          Icon(icon, color: color, size: 28),
-
-          const SizedBox(height: 10),
-
-          Text(
-            value,
-
-            style: const TextStyle(
-              color: Colors.white,
-
-              fontWeight: FontWeight.bold,
-
-              fontSize: 18,
-            ),
-          ),
-
-          const SizedBox(height: 5),
-
-          Text(
-            title,
-
-            style: TextStyle(color: Colors.grey.shade500, fontSize: 12),
-          ),
-        ],
-      ),
-    );
+  Future<void> _unsave(BuildContext context) async {
+    try {
+      await context.read<PostsController>().toggleBookmarkBackend(post.id);
+    } on ApiException catch (e) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(e.message)));
+    }
   }
 
-  Widget _emptyState(AppLocalizations l10n, Color accentColor) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 80),
-
-      child: Center(
-        child: Column(
-          children: [
-            Icon(Icons.bookmark_border, color: Colors.grey.shade700, size: 70),
-
-            const SizedBox(height: 20),
-
-            Text(
-              l10n.savedEmptyTitle,
-
-              style: const TextStyle(
-                color: Colors.white,
-
-                fontSize: 22,
-
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-
-            const SizedBox(height: 10),
-
-            Text(
-              l10n.savedEmptySubtitle,
-
-              textAlign: TextAlign.center,
-
-              style: TextStyle(color: Colors.grey.shade500),
-            ),
-
-            const SizedBox(height: 25),
-
-            FilledButton.icon(
-              style: FilledButton.styleFrom(backgroundColor: accentColor),
-
-              onPressed: () {},
-
-              icon: const Icon(Icons.add),
-
-              label: Text(l10n.savedNewCollectionLabel),
-            ),
-          ],
+  void _openPost(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => Scaffold(
+          appBar: AppBar(),
+          body: SingleChildScrollView(
+            padding: const EdgeInsets.only(top: 8),
+            child: BackendPostCard(post: post),
+          ),
         ),
       ),
     );

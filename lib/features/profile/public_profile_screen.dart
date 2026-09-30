@@ -18,7 +18,9 @@ import 'package:Zentry/core/providers/community_controller.dart';
 import 'package:Zentry/core/providers/follow_controller.dart';
 import 'package:Zentry/core/providers/notifications_controller.dart';
 import 'package:Zentry/core/providers/posts_controller.dart';
+import 'package:Zentry/core/widgets/zentry_network_image.dart';
 import 'package:Zentry/features/chat/conversation_screen.dart';
+import 'package:Zentry/features/profile/profile_avatar_story_ring.dart';
 import 'package:Zentry/l10n/generated/app_localizations.dart';
 import 'package:Zentry/theme/theme_controller.dart';
 
@@ -457,34 +459,38 @@ class _PublicProfileScreenState extends State<PublicProfileScreen> {
                       Positioned(
                         left: 18,
                         bottom: -34,
-                        child: Container(
-                          padding: const EdgeInsets.all(3),
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Theme.of(context).scaffoldBackgroundColor,
-                            gradient: LinearGradient(
-                              colors: avatarFrameColors(
-                                widget.user.avatarFrameId,
-                              ),
-                            ),
+                        child: ProfileAvatarStoryRing(
+                          userId: _resolvedOtherId ?? 0,
+                          displayName: widget.user.displayName,
+                          username: widget.user.username,
+                          avatarUrl: avatarUrlAbs,
+                          fallbackGradient: avatarFrameColors(
+                            widget.user.avatarFrameId,
                           ),
-                          child: CircleAvatar(
-                            radius: 34,
-                            backgroundColor: Colors.white10,
-                            backgroundImage: widget.user.photoPath != null
-                                ? FileImage(File(widget.user.photoPath!))
-                                : avatarUrlAbs != null
-                                ? NetworkImage(avatarUrlAbs)
-                                : null,
-                            child:
-                                (widget.user.photoPath == null &&
-                                    avatarUrlAbs == null)
-                                ? const Icon(
-                                    Icons.person,
-                                    color: Colors.white54,
-                                    size: 30,
-                                  )
-                                : null,
+                          child: Container(
+                            padding: const EdgeInsets.all(3),
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Theme.of(context).scaffoldBackgroundColor,
+                            ),
+                            child: CircleAvatar(
+                              radius: 34,
+                              backgroundColor: Colors.white10,
+                              backgroundImage: widget.user.photoPath != null
+                                  ? FileImage(File(widget.user.photoPath!))
+                                  : avatarUrlAbs != null
+                                  ? NetworkImage(avatarUrlAbs)
+                                  : null,
+                              child:
+                                  (widget.user.photoPath == null &&
+                                      avatarUrlAbs == null)
+                                  ? const Icon(
+                                      Icons.person,
+                                      color: Colors.white54,
+                                      size: 30,
+                                    )
+                                  : null,
+                            ),
                           ),
                         ),
                       ),
@@ -747,13 +753,9 @@ class _PublicProfileScreenState extends State<PublicProfileScreen> {
                           return Container(
                             color: Colors.white10,
                             child: url != null
-                                ? Image.network(
-                                    url,
+                                ? ZentryNetworkImage(
+                                    imageUrl: url,
                                     fit: BoxFit.cover,
-                                    errorBuilder: (_, __, ___) => const Icon(
-                                      Icons.broken_image_outlined,
-                                      color: Colors.white24,
-                                    ),
                                   )
                                 : Padding(
                                     padding: const EdgeInsets.all(8),
@@ -783,7 +785,10 @@ class _PublicProfileScreenState extends State<PublicProfileScreen> {
                                         const SizedBox.shrink(),
                                   )
                                 : imageUrl != null
-                                ? Image.network(imageUrl, fit: BoxFit.cover)
+                                ? ZentryNetworkImage(
+                                    imageUrl: imageUrl,
+                                    fit: BoxFit.cover,
+                                  )
                                 : Padding(
                                     padding: const EdgeInsets.all(8),
                                     child: Text(
@@ -911,6 +916,10 @@ class _PublicProfileScreenState extends State<PublicProfileScreen> {
     );
   }
 
+  /// Rama SOLO para `!_isBackendUser`: perfiles que el backend no reconoce
+  /// (mock de recomendaciones/comunidades/etc. que aún no tienen usuario
+  /// real). Ver el doc-comment de `FollowController` — nunca debe usarse
+  /// para un usuario real, esos siempre pasan por `_toggleFollowReal`.
   Future<void> _toggleFollowLocal(
     AppUser? currentUser,
     bool isFollowing,

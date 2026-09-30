@@ -11,6 +11,7 @@ import 'package:Zentry/core/network/profile_api.dart';
 import 'package:Zentry/core/providers/auth_controller.dart';
 import 'package:Zentry/core/providers/community_controller.dart';
 import 'package:Zentry/core/providers/posts_controller.dart';
+import 'package:Zentry/core/widgets/zentry_network_image.dart';
 import 'package:Zentry/features/communities/community_detail_screen.dart';
 import 'package:Zentry/features/explore/category_detail_screen.dart';
 import 'package:Zentry/features/profile/public_profile_screen.dart';
@@ -267,7 +268,7 @@ Widget _postTile(BuildContext context, Map<String, dynamic> post) {
                     const ColoredBox(color: Colors.white10),
               )
             : imageUrl != null
-            ? Image.network(imageUrl, fit: BoxFit.cover)
+            ? ZentryNetworkImage(imageUrl: imageUrl, fit: BoxFit.cover)
             : const ColoredBox(
                 color: Colors.white10,
                 child: Icon(Icons.article_outlined, color: Colors.white38),
@@ -316,7 +317,7 @@ Widget _communityTile(BuildContext context, Community community) {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (_) => CommunityDetailScreen(communityId: community.id),
+          builder: (_) => CommunityDetailScreen(identifier: community.id),
         ),
       );
     },

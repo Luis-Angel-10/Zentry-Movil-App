@@ -1,11 +1,11 @@
 import 'package:Zentry/core/models/app_user.dart';
+import 'package:Zentry/core/models/backend/friend_user_response.dart';
 import 'package:Zentry/core/models/community.dart';
 import 'package:Zentry/core/models/creative_challenge.dart';
+import 'package:Zentry/core/network/friends_api.dart';
 import 'package:Zentry/core/providers/community_controller.dart';
 import 'package:Zentry/core/providers/creative_challenge_controller.dart';
-import 'package:Zentry/core/providers/follow_controller.dart';
 import 'package:Zentry/core/providers/posts_controller.dart';
-import 'package:Zentry/core/services/auth_repository.dart';
 
 class RecommendationService {
   const RecommendationService._();
@@ -40,36 +40,16 @@ class RecommendationService {
     return candidates.take(limit).toList();
   }
 
-  static Future<List<AppUser>> suggestedCreators({
-    required AppUser? user,
-    required FollowController follow,
-    required AuthRepository authRepository,
-    int limit = 5,
-  }) async {
-    if (user == null) return const [];
-
-    final all = await authRepository.allUsers(excludeId: user.id);
-    final notFollowed = all
-        .where((u) => !follow.isFollowing(user.id, u.id))
-        .toList();
-
-    int score(AppUser candidate) {
-      var s = 0;
-      if (candidate.discipline != null &&
-          candidate.discipline == user.discipline) {
-        s += 2;
-      }
-      if (candidate.discipline != null &&
-          user.interests.contains(candidate.discipline)) {
-        s += 1;
-      }
-      s += candidate.interests.where(user.interests.contains).length;
-      return s;
-    }
-
-    notFollowed.sort((a, b) => score(b).compareTo(score(a)));
-
-    return notFollowed.take(limit).toList();
+  /// Sugerencias de creadores REALES (`GET /api/core/friends/suggestions`).
+  ///
+  /// El backend ya excluye al usuario actual, amigos actuales y cualquier
+  /// solicitud de amistad pendiente en cualquier dirección. NO existe un
+  /// endpoint que además excluya a quien ya sigues (el grafo de "follow" es
+  /// independiente del de amistad en este backend) — documentado como
+  /// requisito pendiente en el reporte de esta fase, no se simula del lado
+  /// de Flutter.
+  static Future<List<FriendUserResponse>> suggestedCreators({int limit = 5}) {
+    return FriendsApi.instance.getSuggestions(limit: limit);
   }
 
   static List<Map<String, dynamic>> recommendedPosts({

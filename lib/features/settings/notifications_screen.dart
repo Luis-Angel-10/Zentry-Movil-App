@@ -50,7 +50,7 @@ class _NotificationsScreenState extends State<NotificationsScreen>
 
       "color": Colors.red,
 
-      "avatar": "assets/login.png",
+      "avatar": null,
 
       "read": false,
     },
@@ -68,7 +68,7 @@ class _NotificationsScreenState extends State<NotificationsScreen>
 
       "color": Colors.blue,
 
-      "avatar": "assets/inicio.png",
+      "avatar": null,
 
       "read": false,
     },
@@ -86,7 +86,7 @@ class _NotificationsScreenState extends State<NotificationsScreen>
 
       "color": Colors.green,
 
-      "avatar": "assets/login.png",
+      "avatar": null,
 
       "read": true,
     },
@@ -104,7 +104,7 @@ class _NotificationsScreenState extends State<NotificationsScreen>
 
       "color": Colors.amber,
 
-      "avatar": "assets/inicio.png",
+      "avatar": null,
 
       "read": false,
     },
@@ -122,7 +122,7 @@ class _NotificationsScreenState extends State<NotificationsScreen>
 
       "color": null,
 
-      "avatar": "assets/login.png",
+      "avatar": null,
 
       "read": true,
     },
@@ -484,10 +484,20 @@ class _NotificationsScreenState extends State<NotificationsScreen>
                                     children: [
                                       CircleAvatar(
                                         radius: 28,
-
-                                        backgroundImage: AssetImage(
-                                          notification["avatar"],
-                                        ),
+                                        backgroundColor: Colors.white10,
+                                        backgroundImage:
+                                            notification["avatar"] != null
+                                            ? AssetImage(
+                                                notification["avatar"]
+                                                    as String,
+                                              )
+                                            : null,
+                                        child: notification["avatar"] == null
+                                            ? const Icon(
+                                                Icons.person,
+                                                color: Colors.white38,
+                                              )
+                                            : null,
                                       ),
 
                                       Positioned(

@@ -1,12 +1,17 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:video_player/video_player.dart';
 
+import 'package:Zentry/core/network/api_exception.dart';
 import 'package:Zentry/core/providers/auth_controller.dart';
 import 'package:Zentry/core/providers/posts_controller.dart';
+import 'package:Zentry/core/video/zentry_video_decoder_coordinator.dart';
+import 'package:Zentry/core/widgets/zentry_network_image.dart';
 import 'package:Zentry/features/chat/chat_screen.dart';
+import 'package:Zentry/features/chat/conversation_screen.dart';
 import 'package:Zentry/l10n/generated/app_localizations.dart';
 
 class StoryViewerScreen extends StatefulWidget {
@@ -98,15 +103,28 @@ class _StoryViewerScreenState extends State<StoryViewerScreen>
       return;
     }
 
-    final storyId = _story["id"] as String?;
-    if (storyId != null) {
-      context.read<PostsController>().deleteStory(storyId);
+    final storyIntId = _story["storyIntId"] as int?;
+    if (storyIntId != null) {
+      // Historia real del backend: soft-delete server-side (sólo el autor).
+      await context.read<PostsController>().deleteBackendStory(storyIntId);
+    } else {
+      final storyId = _story["id"] as String?;
+      if (storyId != null) {
+        context.read<PostsController>().deleteStory(storyId);
+      }
     }
     if (mounted) Navigator.pop(context);
   }
 
   void _registerView(int index) {
     final story = widget.stories[index];
+    final storyIntId = story["storyIntId"] as int?;
+    if (storyIntId != null) {
+      // El backend calcula "vista" real por usuario (unique constraint);
+      // no bloquea la reproducción si falla.
+      context.read<PostsController>().viewBackendStory(storyIntId);
+      return;
+    }
     final storyId = story["id"] as String?;
     final viewer = context.read<AuthController>().currentUser?.displayName;
     if (storyId == null || viewer == null) return;
@@ -126,19 +144,50 @@ class _StoryViewerScreenState extends State<StoryViewerScreen>
     _videoReady = false;
     oldVideoController?.dispose();
 
-    final videoFile = widget.stories[index]["videoFile"] as File?;
+    final story = widget.stories[index];
+    final videoFile = story["videoFile"] as File?;
+    final bool isNetworkVideo =
+        story["mediaIsVideo"] == true && story["mediaUrl"] != null;
 
-    if (videoFile == null) {
+    if (videoFile == null && !isNetworkVideo) {
       _progressController.duration = _maxDuration;
       if (mounted) setState(() {});
       _progressController.forward(from: 0);
       return;
     }
 
-    final controller = VideoPlayerController.file(videoFile);
-    try {
-      await controller.initialize();
-    } catch (_) {
+    // Ya cacheada por `cached_network_image` en cualquier lugar previo donde
+    // se haya mostrado esta misma URL; `VideoPlayerController` mantiene su
+    // propio caché de red interno para la reproducción en sí.
+    final controller = isNetworkVideo
+        ? VideoPlayerController.networkUrl(
+            Uri.parse(story["mediaUrl"] as String),
+          )
+        : VideoPlayerController.file(videoFile!);
+
+    var initialized = false;
+    for (var attempt = 1; attempt <= 3 && !initialized; attempt++) {
+      try {
+        // Serializado con cualquier otro video de la app (feed/fullscreen):
+        // ver ZentryVideoDecoderCoordinator — evita pedirle al SO dos
+        // decoders al mismo tiempo (causa real confirmada por logcat en
+        // hardware con pocos decoders concurrentes, p. ej. tablets
+        // Huawei/HiSilicon).
+        await ZentryVideoDecoderCoordinator.instance.runExclusive(
+          controller.initialize,
+        );
+        initialized = true;
+      } catch (e) {
+        debugPrint(
+          '[Zentry][video] historia: falló inicialización (intento $attempt/3): $e',
+        );
+        if (attempt < 3) {
+          await Future.delayed(Duration(milliseconds: 350 * attempt));
+        }
+      }
+    }
+    if (!initialized) {
+      controller.dispose();
       if (token != _loadToken) return;
       _progressController.duration = _maxDuration;
       if (mounted) setState(() {});
@@ -203,13 +252,50 @@ class _StoryViewerScreenState extends State<StoryViewerScreen>
     });
   }
 
+  Future<void> _toggleStoryLike() async {
+    final storyIntId = _story["storyIntId"] as int?;
+    if (storyIntId == null) return;
+    HapticFeedback.lightImpact();
+    // `toggleBackendStoryLike` actualiza `PostsController.backendStoryGroups`
+    // (la fuente real, con su propia reversión interna si el backend
+    // rechaza — no relanza la excepción), pero `_story` es la entrada de
+    // `widget.stories`, un snapshot de mapas tomado UNA vez al abrir el
+    // visor que no se entera solo de ese cambio. Se refleja aquí de forma
+    // optimista para que el corazón cambie al instante...
+    final wasLiked = _story["likedByMe"] == true;
+    final previousLikes = _story["likes"] as int? ?? 0;
+    setState(() {
+      _story["likedByMe"] = !wasLiked;
+      _story["likes"] = wasLiked ? previousLikes - 1 : previousLikes + 1;
+    });
+    final controller = context.read<PostsController>();
+    await controller.toggleBackendStoryLike(storyIntId);
+    if (!mounted) return;
+    // ...y al terminar se sincroniza con el valor REAL ya reconciliado en el
+    // controller (haya tenido éxito o se haya revertido), en vez de asumir
+    // que el optimismo de arriba siguió siendo correcto.
+    for (final group in controller.backendStoryGroups) {
+      for (final s in group.items) {
+        if (s.id == storyIntId) {
+          setState(() {
+            _story["likedByMe"] = s.isLiked;
+            _story["likes"] = s.likesCount;
+          });
+          return;
+        }
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final File? imageFile = _story["imageFile"] as File?;
+    final String? networkMediaUrl = _story["mediaUrl"] as String?;
+    final bool mediaIsVideo = _story["mediaIsVideo"] == true;
     final String content = _story["content"] as String? ?? '';
     final String user = _story["user"] as String? ?? '';
     final String time = _story["time"] as String? ?? '';
-    final bool isVideo = _story["videoFile"] != null;
+    final bool isVideo = _story["videoFile"] != null || mediaIsVideo;
 
     return Scaffold(
       backgroundColor: Colors.black,
@@ -226,6 +312,11 @@ class _StoryViewerScreenState extends State<StoryViewerScreen>
                       imageFile,
                       fit: BoxFit.cover,
                       errorBuilder: (_, __, ___) => const _StoryFallback(),
+                    )
+                  : networkMediaUrl != null
+                  ? ZentryNetworkImage(
+                      imageUrl: networkMediaUrl,
+                      fit: BoxFit.cover,
                     )
                   : const _StoryFallback(),
             ),
@@ -375,6 +466,25 @@ class _StoryViewerScreenState extends State<StoryViewerScreen>
                       ),
                       onPressed: _toggleMute,
                     ),
+                  // Reacción real a la historia (Sección 8): el backend sólo
+                  // guarda un like/unlike booleano por historia (`StoryLike`,
+                  // sin campo de tipo de emoji — confirmado por lectura del
+                  // backend), así que se muestra un solo corazón real en vez
+                  // de un selector de varios emojis que fingiría guardar
+                  // algo que el servidor no soporta. No aplica a la propia
+                  // historia (no hay "reply bar" tampoco en ese caso).
+                  if (!_isOwner && _story["storyIntId"] != null)
+                    IconButton(
+                      icon: Icon(
+                        _story["likedByMe"] == true
+                            ? Icons.favorite
+                            : Icons.favorite_border,
+                        color: _story["likedByMe"] == true
+                            ? Colors.redAccent
+                            : Colors.white,
+                      ),
+                      onPressed: _toggleStoryLike,
+                    ),
                   IconButton(
                     icon: const Icon(Icons.close, color: Colors.white),
                     onPressed: () => Navigator.pop(context),
@@ -418,6 +528,40 @@ class _StoryViewerScreenState extends State<StoryViewerScreen>
 
   Widget _viewersBar() {
     final l10n = AppLocalizations.of(context)!;
+    final storyIntId = _story["storyIntId"] as int?;
+
+    // El backend sólo expone un CONTADOR de vistas (`view_count`), no la
+    // identidad de cada espectador — no hay endpoint para "quién vio mi
+    // historia". Para historias reales se muestra el número real y no es
+    // tocable; el listado nombre-por-nombre sigue existiendo sólo para el
+    // sistema local legado.
+    if (storyIntId != null) {
+      final viewCount = _story["viewCount"] as int? ?? 0;
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            decoration: BoxDecoration(
+              color: Colors.black54,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.visibility, color: Colors.white, size: 16),
+                const SizedBox(width: 6),
+                Text(
+                  l10n.storyViewersCount(viewCount),
+                  style: const TextStyle(color: Colors.white, fontSize: 12),
+                ),
+              ],
+            ),
+          ),
+        ],
+      );
+    }
+
     final storyId = _story["id"] as String?;
     final viewers = storyId == null
         ? const <String>[]
@@ -537,17 +681,58 @@ class _StoryViewerScreenState extends State<StoryViewerScreen>
     );
   }
 
-  void _sendReply() {
+  /// CORRECCIÓN: antes esto sólo abría un chat local vacío (mock, sin
+  /// backend) con el texto precargado — la respuesta nunca se enviaba de
+  /// verdad ni quedaba asociada a ninguna conversación real. Ahora, para
+  /// historias reales del backend, llama al endpoint real de respuesta
+  /// (crea un `Message` real en la conversación 1 a 1 real con el dueño de
+  /// la historia — ver doc-comment de `PostsController.replyToBackendStory`)
+  /// y navega a esa conversación REAL, no a un chat vacío.
+  Future<void> _sendReply() async {
     final text = _replyController.text.trim();
     if (text.isEmpty) return;
-    final user = _story["user"] as String? ?? '';
+    final storyIntId = _story["storyIntId"] as int?;
+    final userId = _story["userId"] as int?;
+    final username = _story["username"] as String?;
+    final displayName = _story["user"] as String? ?? '';
+
+    if (storyIntId != null && userId != null && username != null) {
+      _replyController.clear();
+      try {
+        await context.read<PostsController>().replyToBackendStory(
+          storyIntId,
+          text,
+        );
+      } on ApiException catch (e) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(e.message)));
+        return;
+      }
+      if (!mounted) return;
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => ConversationScreen(
+            otherUserId: userId,
+            otherUsername: username,
+            otherDisplayName: displayName,
+          ),
+        ),
+      );
+      return;
+    }
+
+    // Historia local legada (sin backend): se conserva el comportamiento
+    // previo, ya que no existe ningún endpoint real al que llamar.
     final l10n = AppLocalizations.of(context)!;
     _replyController.clear();
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (_) => ChatScreen(
-          initialContactName: user,
+          initialContactName: displayName,
           initialMessage: l10n.storyReplyMessagePrefix(text),
         ),
       ),

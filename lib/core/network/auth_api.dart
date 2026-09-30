@@ -99,4 +99,43 @@ class AuthApi {
       (_) {},
     );
   }
+
+  /// `POST /api/auth/forgot-password` — body `{email}`.
+  /// 200 -> `{message, requiresVerification: true}` (envía OTP de 6 dígitos,
+  /// vigente 10 min). 404 -> no existe cuenta con ese correo.
+  Future<AuthResponse> forgotPassword({required String email}) {
+    return _c.guard(
+      () => _c.dio.post(
+        '/api/auth/forgot-password',
+        data: {'email': email.trim()},
+        options: _public,
+      ),
+      (data) => AuthResponse.fromJson(_asMap(data)),
+    );
+  }
+
+  /// `POST /api/auth/reset-password` — body `{email, code, newPassword}`.
+  /// Verifica el código y cambia la contraseña en la misma llamada (el
+  /// backend no expone un endpoint separado de "verificar código").
+  /// 200 -> UserResponse sin token. 400 -> código incorrecto o
+  /// `newPassword` inválida (min. 6). 410 -> código expirado.
+  /// 429 -> demasiados intentos fallidos.
+  Future<AuthResponse> resetPassword({
+    required String email,
+    required String code,
+    required String newPassword,
+  }) {
+    return _c.guard(
+      () => _c.dio.post(
+        '/api/auth/reset-password',
+        data: {
+          'email': email.trim(),
+          'code': code.trim(),
+          'newPassword': newPassword,
+        },
+        options: _public,
+      ),
+      (data) => AuthResponse.fromJson(_asMap(data)),
+    );
+  }
 }

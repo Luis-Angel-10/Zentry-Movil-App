@@ -4,13 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'package:Zentry/core/models/app_user.dart';
+import 'package:Zentry/core/models/backend/friend_user_response.dart';
+import 'package:Zentry/core/network/api_exception.dart';
 import 'package:Zentry/core/providers/auth_controller.dart';
 import 'package:Zentry/core/providers/community_controller.dart';
 import 'package:Zentry/core/providers/creative_challenge_controller.dart';
-import 'package:Zentry/core/providers/follow_controller.dart';
 import 'package:Zentry/core/providers/posts_controller.dart';
-import 'package:Zentry/core/services/auth_repository.dart';
 import 'package:Zentry/core/services/recommendation_service.dart';
+import 'package:Zentry/core/widgets/zentry_network_image.dart';
 import 'package:Zentry/features/challenges/creative_challenge_detail_screen.dart';
 import 'package:Zentry/features/communities/community_detail_screen.dart';
 import 'package:Zentry/features/profile/public_profile_screen.dart';
@@ -25,8 +26,7 @@ class ForYouScreen extends StatefulWidget {
 }
 
 class _ForYouScreenState extends State<ForYouScreen> {
-  final _authRepository = AuthRepository();
-  List<AppUser> _suggestedCreators = [];
+  List<FriendUserResponse> _suggestedCreators = [];
 
   @override
   void initState() {
@@ -37,18 +37,24 @@ class _ForYouScreenState extends State<ForYouScreen> {
   bool _loadingCreators = true;
 
   Future<void> _loadCreators() async {
-    final user = context.read<AuthController>().currentUser;
-    final follow = context.read<FollowController>();
-    final creators = await RecommendationService.suggestedCreators(
-      user: user,
-      follow: follow,
-      authRepository: _authRepository,
-    );
-    if (mounted) {
-      setState(() {
-        _suggestedCreators = creators;
-        _loadingCreators = false;
-      });
+    try {
+      final creators = await RecommendationService.suggestedCreators();
+      if (mounted) {
+        setState(() {
+          _suggestedCreators = creators;
+          _loadingCreators = false;
+        });
+      }
+    } on ApiException {
+      // Sin sesión/red: se deja la sección vacía en vez de romper la
+      // pantalla completa (comunidades/retos/posts recomendados siguen
+      // funcionando igual, son locales).
+      if (mounted) {
+        setState(() {
+          _suggestedCreators = [];
+          _loadingCreators = false;
+        });
+      }
     }
   }
 
@@ -137,8 +143,14 @@ class _ForYouScreenState extends State<ForYouScreen> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (_) =>
-                                      PublicProfileScreen(user: creator),
+                                  builder: (_) => PublicProfileScreen(
+                                    user: AppUser(
+                                      id: creator.id,
+                                      fullName: creator.displayName,
+                                      username: creator.username ?? '',
+                                      email: '',
+                                    ),
+                                  ),
                                 ),
                               );
                             },
@@ -151,17 +163,13 @@ class _ForYouScreenState extends State<ForYouScreen> {
                               ),
                               child: Column(
                                 children: [
-                                  CircleAvatar(
+                                  ZentryAvatar(
                                     radius: 26,
-                                    backgroundColor: accentColor.withOpacity(
-                                      .2,
+                                    backgroundColor: accentColor.withValues(
+                                      alpha: .2,
                                     ),
-                                    backgroundImage: creator.photoPath != null
-                                        ? FileImage(File(creator.photoPath!))
-                                        : null,
-                                    child: creator.photoPath == null
-                                        ? Icon(Icons.person, color: accentColor)
-                                        : null,
+                                    networkUrl: creator.avatarUrlAbsolute,
+                                    iconColor: accentColor,
                                   ),
                                   const SizedBox(height: 8),
                                   Text(
@@ -196,7 +204,7 @@ class _ForYouScreenState extends State<ForYouScreen> {
                             context,
                             MaterialPageRoute(
                               builder: (_) =>
-                                  CommunityDetailScreen(communityId: c.id),
+                                  CommunityDetailScreen(identifier: c.id),
                             ),
                           );
                         },
@@ -287,7 +295,7 @@ class _ForYouScreenState extends State<ForYouScreen> {
                               Container(
                                 padding: const EdgeInsets.all(10),
                                 decoration: BoxDecoration(
-                                  color: Colors.amber.withOpacity(.15),
+                                  color: Colors.amber.withValues(alpha: .15),
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                                 child: const Icon(
@@ -362,7 +370,10 @@ class _ForYouScreenState extends State<ForYouScreen> {
                                         const SizedBox.shrink(),
                                   )
                                 : imageUrl != null
-                                ? Image.network(imageUrl, fit: BoxFit.cover)
+                                ? ZentryNetworkImage(
+                                    imageUrl: imageUrl,
+                                    fit: BoxFit.cover,
+                                  )
                                 : Padding(
                                     padding: const EdgeInsets.all(6),
                                     child: Text(

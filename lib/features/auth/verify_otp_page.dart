@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 
 import 'package:Zentry/core/providers/auth_controller.dart';
 import 'package:Zentry/core/services/auth_repository.dart';
+import 'package:Zentry/l10n/generated/app_localizations.dart';
 
 /// Verificación por código (OTP) que exige el backend tras el registro.
 ///
@@ -56,27 +57,28 @@ class _VerifyOtpPageState extends State<VerifyOtpPage> {
     });
   }
 
-  String _messageFor(AuthFailure f) {
+  String _messageFor(AppLocalizations l10n, AuthFailure f) {
     switch (f) {
       case AuthFailure.otpInvalid:
-        return 'Código incorrecto. Revísalo e inténtalo de nuevo.';
+        return l10n.authVerifyOtpInvalidError;
       case AuthFailure.otpExpired:
-        return 'El código expiró. Solicita uno nuevo.';
+        return l10n.authVerifyOtpExpiredError;
       case AuthFailure.otpTooManyAttempts:
-        return 'Demasiados intentos. Solicita un código nuevo.';
+        return l10n.authVerifyOtpTooManyAttemptsError;
       case AuthFailure.userNotFound:
-        return 'No encontramos una cuenta con ese correo.';
+        return l10n.authVerifyOtpUserNotFoundError;
       case AuthFailure.network:
-        return 'Sin conexión con el servidor. Verifica tu red.';
+        return l10n.authVerifyOtpNetworkError;
       case AuthFailure.serverError:
-        return 'Error del servidor. Inténtalo más tarde.';
+        return l10n.authVerifyOtpServerError;
       default:
-        return 'No se pudo verificar el código.';
+        return l10n.authVerifyOtpGenericError;
     }
   }
 
   Future<void> _verify() async {
     if (!_formKey.currentState!.validate()) return;
+    final l10n = AppLocalizations.of(context)!;
     final auth = context.read<AuthController>();
     if (auth.isLoading) return;
 
@@ -94,7 +96,7 @@ class _VerifyOtpPageState extends State<VerifyOtpPage> {
     if (!mounted) return;
 
     if (failure != null) {
-      _snack(_messageFor(failure), error: true);
+      _snack(_messageFor(l10n, failure), error: true);
       return;
     }
 
@@ -104,13 +106,14 @@ class _VerifyOtpPageState extends State<VerifyOtpPage> {
 
   Future<void> _resend() async {
     if (_resendCooldown > 0) return;
+    final l10n = AppLocalizations.of(context)!;
     final auth = context.read<AuthController>();
     final failure = await auth.resendOtp(widget.email);
     if (!mounted) return;
     if (failure != null) {
-      _snack(_messageFor(failure), error: true);
+      _snack(_messageFor(l10n, failure), error: true);
     } else {
-      _snack('Te enviamos un nuevo código.');
+      _snack(l10n.authVerifyOtpResentMessage);
       _startCooldown();
     }
   }
@@ -132,6 +135,7 @@ class _VerifyOtpPageState extends State<VerifyOtpPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final isLoading = context.watch<AuthController>().isLoading;
 
     return Scaffold(
@@ -170,10 +174,10 @@ class _VerifyOtpPageState extends State<VerifyOtpPage> {
                           size: 56,
                         ),
                         const SizedBox(height: 18),
-                        const Text(
-                          'Verifica tu correo',
+                        Text(
+                          l10n.authVerifyOtpTitle,
                           textAlign: TextAlign.center,
-                          style: TextStyle(
+                          style: const TextStyle(
                             color: Colors.white,
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
@@ -181,7 +185,7 @@ class _VerifyOtpPageState extends State<VerifyOtpPage> {
                         ),
                         const SizedBox(height: 10),
                         Text(
-                          'Escribe el código de 6 dígitos que enviamos a\n${widget.email}',
+                          l10n.authVerifyOtpSubtitle(widget.email),
                           textAlign: TextAlign.center,
                           style: const TextStyle(
                             color: Colors.white54,
@@ -224,7 +228,7 @@ class _VerifyOtpPageState extends State<VerifyOtpPage> {
                             ),
                             validator: (v) {
                               if ((v ?? '').trim().length != 6) {
-                                return 'El código tiene 6 dígitos';
+                                return l10n.authVerifyOtpCodeLengthError;
                               }
                               return null;
                             },
@@ -251,9 +255,9 @@ class _VerifyOtpPageState extends State<VerifyOtpPage> {
                                       color: Colors.white,
                                     ),
                                   )
-                                : const Text(
-                                    'Verificar',
-                                    style: TextStyle(
+                                : Text(
+                                    l10n.authVerifyOtpSubmitButton,
+                                    style: const TextStyle(
                                       color: Colors.white,
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold,
@@ -268,8 +272,10 @@ class _VerifyOtpPageState extends State<VerifyOtpPage> {
                               : _resend,
                           child: Text(
                             _resendCooldown > 0
-                                ? 'Reenviar código en $_resendCooldown s'
-                                : 'Reenviar código',
+                                ? l10n.authVerifyOtpResendCooldown(
+                                    _resendCooldown,
+                                  )
+                                : l10n.authVerifyOtpResendButton,
                             style: const TextStyle(color: Colors.white70),
                           ),
                         ),
@@ -277,9 +283,9 @@ class _VerifyOtpPageState extends State<VerifyOtpPage> {
                           onPressed: isLoading
                               ? null
                               : () => Navigator.of(context).maybePop(),
-                          child: const Text(
-                            'Volver',
-                            style: TextStyle(color: Colors.white38),
+                          child: Text(
+                            l10n.authVerifyOtpBackButton,
+                            style: const TextStyle(color: Colors.white38),
                           ),
                         ),
                       ],

@@ -144,6 +144,8 @@
   "chatCallingVideoLabel": "Videollamada…",
   "chatNoStatusesLabel": "Aún no hay historias recientes",
   "homeAddStoryLabel": "Tu historia",
+  "homeStoriesLoading": "Cargando…",
+  "homeStoriesRetry": "Reintentar",
   "storyVisibilityPublic": "Público",
   "storyVisibilityFollowers": "Solo seguidores",
   "storyViewersCount": "{count, plural, =0{Nadie ha visto esto aún} one{1 vista} other{{count} vistas}}",
@@ -158,6 +160,8 @@
   "storyViewersEmpty": "Aún nadie ha visto esta historia",
   "storyReplyHint": "Responder a la historia…",
   "storyReplyMessagePrefix": "Respondió a tu historia: {text}",
+  "chatRepliedToStory": "Respondiste a su historia",
+  "chatRepliedToYourStory": "Respondió a tu historia",
   "@storyReplyMessagePrefix": {
     "placeholders": {
       "text": {
@@ -197,6 +201,15 @@
   "communitiesHotBadge": "HOT",
   "communitiesMemberLabel": "Miembro",
   "communitiesJoinLabel": "Unirse",
+  "communitiesRoleOwner": "Creador",
+  "communitiesMembersCount": "{count, plural, =0{Sin miembros} one{1 miembro} other{{count} miembros}}",
+  "@communitiesMembersCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "communitiesEmptyTitle": "No se encontraron comunidades",
   "communitiesEmptySubtitle": "Prueba otra búsqueda o explora nuevas categorías.",
   "communitiesExploringSnackbar": "Explorando nuevas comunidades...",
@@ -786,6 +799,14 @@
   "streakScreenTitle": "Racha",
   "streakScreenActiveToday": "Racha encendida hoy",
   "streakScreenInactiveToday": "Da like, comenta o publica para encenderla hoy",
+  "streakScreenPendingToday": "Tu racha de {count} días sigue viva. Actúa hoy para conservarla",
+  "@streakScreenPendingToday": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "streakScreenWeekTitle": "Actividad de la semana",
   "streakScreenExplainer": "La racha se enciende la primera vez en el día que das like, comentas o publicas algo. Si un día pasa sin actividad, la racha se reinicia.",
   "challengesScreenTitle": "Retos",
@@ -1282,5 +1303,176 @@
         "type": "int"
       }
     }
-  }
+  },
+  "authForgotPasswordTitle": "¿Olvidaste tu contraseña?",
+  "authForgotPasswordSubtitle": "Ingresa tu correo y te enviaremos un código para restablecer tu contraseña.",
+  "authForgotPasswordEmailHint": "Correo electrónico",
+  "authForgotPasswordEmailInvalid": "Ingresa un correo válido",
+  "authForgotPasswordSubmitButton": "Enviar código",
+  "authForgotPasswordBackToLogin": "Volver a iniciar sesión",
+  "authForgotPasswordUserNotFoundError": "No existe una cuenta con ese correo electrónico.",
+  "authForgotPasswordNetworkError": "Sin conexión con el servidor. Verifica tu red.",
+  "authForgotPasswordServerError": "Error del servidor. Inténtalo más tarde.",
+  "authForgotPasswordGenericError": "No se pudo enviar el código. Inténtalo de nuevo.",
+  "authForgotPasswordSuccessMessage": "Contraseña restablecida. Inicia sesión con tu nueva contraseña.",
+  "authResetPasswordTitle": "Restablece tu contraseña",
+  "authResetPasswordSubtitle": "Escribe el código de 6 dígitos que enviamos a\n{email} y elige tu nueva contraseña.",
+  "@authResetPasswordSubtitle": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "authResetPasswordCodeLengthError": "El código tiene 6 dígitos",
+  "authResetPasswordNewPasswordHint": "Nueva contraseña",
+  "authResetPasswordMinLengthError": "Mínimo 6 caracteres",
+  "authResetPasswordConfirmHint": "Confirmar contraseña",
+  "authResetPasswordMismatchError": "Las contraseñas no coinciden",
+  "authResetPasswordSubmitButton": "Restablecer contraseña",
+  "authResetPasswordResendCooldown": "Reenviar código en {seconds} s",
+  "@authResetPasswordResendCooldown": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "authResetPasswordResendButton": "Reenviar código",
+  "authResetPasswordBackButton": "Volver",
+  "authResetPasswordSuccessMessage": "Contraseña restablecida correctamente.",
+  "authResetPasswordResentMessage": "Te enviamos un nuevo código.",
+  "authResetPasswordCodeInvalidError": "Código incorrecto. Revísalo e inténtalo de nuevo.",
+  "authResetPasswordCodeExpiredError": "El código expiró. Solicita uno nuevo.",
+  "authResetPasswordTooManyAttemptsError": "Demasiados intentos. Solicita un código nuevo.",
+  "authResetPasswordWeakPasswordError": "La contraseña debe tener al menos 6 caracteres.",
+  "authResetPasswordNoPendingCodeError": "No hay un código de recuperación pendiente. Solicita uno nuevo.",
+  "authResetPasswordNetworkError": "Sin conexión con el servidor. Verifica tu red.",
+  "authResetPasswordServerError": "Error del servidor. Inténtalo más tarde.",
+  "authResetPasswordGenericError": "No se pudo restablecer la contraseña.",
+  "authVerifyOtpTitle": "Verifica tu correo",
+  "authVerifyOtpSubtitle": "Escribe el código de 6 dígitos que enviamos a\n{email}",
+  "@authVerifyOtpSubtitle": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "authVerifyOtpCodeLengthError": "El código tiene 6 dígitos",
+  "authVerifyOtpSubmitButton": "Verificar",
+  "authVerifyOtpResendCooldown": "Reenviar código en {seconds} s",
+  "@authVerifyOtpResendCooldown": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "authVerifyOtpResendButton": "Reenviar código",
+  "authVerifyOtpBackButton": "Volver",
+  "authVerifyOtpInvalidError": "Código incorrecto. Revísalo e inténtalo de nuevo.",
+  "authVerifyOtpExpiredError": "El código expiró. Solicita uno nuevo.",
+  "authVerifyOtpTooManyAttemptsError": "Demasiados intentos. Solicita un código nuevo.",
+  "authVerifyOtpUserNotFoundError": "No encontramos una cuenta con ese correo.",
+  "authVerifyOtpNetworkError": "Sin conexión con el servidor. Verifica tu red.",
+  "authVerifyOtpServerError": "Error del servidor. Inténtalo más tarde.",
+  "authVerifyOtpGenericError": "No se pudo verificar el código.",
+  "authVerifyOtpResentMessage": "Te enviamos un nuevo código.",
+  "reactionLike": "Me gusta",
+  "reactionLove": "Me encanta",
+  "reactionHaha": "Me divierte",
+  "reactionWow": "Me sorprende",
+  "reactionFire": "Increíble",
+  "reactionCreative": "Creativo",
+  "backendFeedTimeAgoNow": "Ahora",
+  "backendFeedTimeAgoMinutes": "Hace {count} min",
+  "@backendFeedTimeAgoMinutes": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "backendFeedTimeAgoHours": "Hace {count} h",
+  "@backendFeedTimeAgoHours": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "backendFeedTimeAgoDays": "Hace {count} d",
+  "@backendFeedTimeAgoDays": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "backendFeedDefaultUsername": "usuario",
+  "backendFeedPostedInCommunity": "publicó en {community}",
+  "@backendFeedPostedInCommunity": {
+    "placeholders": {
+      "community": {
+        "type": "String"
+      }
+    }
+  },
+  "backendFeedPostedInCommunityUnknown": "publicó en una comunidad",
+  "backendFeedDeletePostTitle": "Eliminar publicación",
+  "backendFeedPostDeletedMessage": "Publicación eliminada",
+  "backendFeedCommentHint": "Escribe un comentario…",
+  "backendFeedNoCommentsYet": "Sé el primero en comentar",
+  "subscriptionComingSoon": "Próximamente",
+  "walletScreenTitle": "Zentry Coins",
+  "walletBalanceLabel": "Saldo disponible",
+  "walletTransferButton": "Transferir",
+  "walletTransactionsTitle": "Movimientos",
+  "walletEmptyTransactions": "Aún no tienes movimientos",
+  "walletErrorGeneric": "No se pudo cargar tu billetera",
+  "walletTransferDialogTitle": "Transferir Zentry Coins",
+  "walletTransferRecipientHint": "Usuario destino",
+  "walletTransferAmountHint": "Cantidad de ZC",
+  "walletTransferSubmitButton": "Enviar",
+  "walletTransferSuccessMessage": "Transferencia realizada",
+  "walletTransferAmountInvalid": "Ingresa una cantidad válida mayor a 0",
+  "walletTransferRecipientRequired": "Ingresa el usuario destino",
+  "walletMenuItem": "Zentry Coins: {balance}",
+  "@walletMenuItem": {
+    "placeholders": {
+      "balance": {
+        "type": "String"
+      }
+    }
+  },
+  "walletTxIngreso": "Ingreso",
+  "walletTxEgreso": "Egreso",
+  "walletTxRecarga": "Recarga",
+  "communityDetailMembersCount": "{count} miembros",
+  "@communityDetailMembersCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "communityDetailRulesTitle": "Reglas de la comunidad",
+  "communityDetailCreatedByLabel": "Creado por @{username}",
+  "@communityDetailCreatedByLabel": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "communityDetailLeaveButton": "Salir",
+  "communityDetailNoPosts": "Aún no hay publicaciones en esta comunidad",
+  "communityDetailNewPostButton": "Nueva publicación",
+  "communityDetailNewPostHint": "¿Qué quieres compartir?",
+  "communityDetailNewPostTitleRequired": "Escribe un título",
+  "communityDetailPostPublishedSnackbar": "Publicación creada",
+  "communityDetailErrorGeneric": "No se pudo cargar la comunidad",
+  "communityDetailNotFound": "Esta comunidad ya no existe",
+  "communityDetailAddImageButton": "Agregar imagen"
 }

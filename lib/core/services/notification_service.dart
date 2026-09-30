@@ -5,8 +5,13 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
+import 'package:Zentry/core/models/app_user.dart';
 import 'package:Zentry/core/navigation/app_navigator.dart';
+import 'package:Zentry/core/network/posts_api.dart';
 import 'package:Zentry/features/chat/conversation_screen.dart';
+import 'package:Zentry/features/home/widgets/backend_feed.dart'
+    show showBackendCommentSheet;
+import 'package:Zentry/features/profile/public_profile_screen.dart';
 
 class NotificationService {
   NotificationService._();
@@ -30,7 +35,8 @@ class NotificationService {
       FlutterLocalNotificationsPlugin();
 
   bool _initialized = false;
-  int _nextId = 1000; // rango separado del id determinista de mensajes (conversationId)
+  int _nextId =
+      1000; // rango separado del id determinista de mensajes (conversationId)
 
   Future<void> init() async {
     if (_initialized || kIsWeb) return;
@@ -92,7 +98,11 @@ class NotificationService {
     }
   }
 
-  Future<void> show({required String title, required String body}) async {
+  Future<void> show({
+    required String title,
+    required String body,
+    String? payload,
+  }) async {
     if (!_initialized || kIsWeb) return;
 
     const androidDetails = AndroidNotificationDetails(
@@ -110,6 +120,7 @@ class NotificationService {
       title,
       body,
       const NotificationDetails(android: androidDetails, iOS: darwinDetails),
+      payload: payload,
     );
   }
 
@@ -153,31 +164,125 @@ class NotificationService {
     await _plugin.cancel(conversationId);
   }
 
+  /// Evita navegar dos veces por el mismo evento cuando FCM entrega el tap
+  /// por más de una vía a la vez (p. ej. `getInitialMessage` +
+  /// `onMessageOpenedApp` en un cold start — caso documentado de FCM).
+  String? _lastHandledNotificationKey;
+
   void _handleTapPayload(String? payload) {
     if (payload == null || payload.isEmpty) return;
     try {
       final data = jsonDecode(payload);
       if (data is! Map) return;
-      final conversationId = (data['conversationId'] as num?)?.toInt();
-      if (conversationId == null) return;
-      final otherUserId = (data['otherUserId'] as num?)?.toInt();
-      final otherUsername = data['otherUsername'] as String?;
+      handleNotificationData(Map<String, dynamic>.from(data));
+    } catch (e) {
+      if (kDebugMode)
+        debugPrint('[Zentry] payload de notificación inválido: $e');
+    }
+  }
 
-      final navigator = appNavigatorKey.currentState;
-      if (navigator == null) return;
-      navigator.push(
-        MaterialPageRoute(
-          builder: (_) => ConversationScreen(
-            conversationId: conversationId,
-            otherUserId: otherUserId,
-            otherUsername: otherUsername ?? '',
-            otherDisplayName: data['otherDisplayName'] as String?,
-            otherAvatarUrl: data['otherAvatarUrl'] as String?,
+  /// Punto único de navegación al tocar CUALQUIER notificación, venga de una
+  /// notificación local (chat) o de FCM (Fase 8/9 del reporte). Centraliza el
+  /// deep-link aquí para que ninguna otra parte de la app duplique esta
+  /// lógica ni pueda mostrar dos navegaciones para el mismo evento.
+  ///
+  /// Contrato del payload (Fase 7): identifica el destino SIEMPRE por ids
+  /// reales (`type`, `actorId`, `conversationId`/`postId`,
+  /// `notificationId`), nunca por el nombre mostrado.
+  void handleNotificationData(Map<String, dynamic> data) {
+    final dedupeKey =
+        data['notificationId']?.toString() ??
+        data['conversationId']?.toString();
+    if (dedupeKey != null && dedupeKey == _lastHandledNotificationKey) return;
+    _lastHandledNotificationKey = dedupeKey;
+
+    final navigator = appNavigatorKey.currentState;
+    if (navigator == null) return;
+
+    final type = data['type'] as String?;
+    switch (type) {
+      case 'like':
+      case 'comment':
+        _openPost(navigator, data);
+      case 'follow':
+      case 'friend_request':
+      case 'friend_accept':
+        _openProfile(navigator, data);
+      case 'message':
+        _openConversation(navigator, data);
+      default:
+        // Compatibilidad con notificaciones locales de chat previas a que
+        // se añadiera el campo `type` (sólo llevaban `conversationId`).
+        if (data.containsKey('conversationId')) {
+          _openConversation(navigator, data);
+        }
+    }
+  }
+
+  void _openConversation(NavigatorState navigator, Map<String, dynamic> data) {
+    final conversationId = (data['conversationId'] as num?)?.toInt();
+    if (conversationId == null) return;
+    final otherUserId = (data['otherUserId'] as num?)?.toInt();
+    final otherUsername = data['otherUsername'] as String?;
+
+    navigator.push(
+      MaterialPageRoute(
+        builder: (_) => ConversationScreen(
+          conversationId: conversationId,
+          otherUserId: otherUserId,
+          otherUsername: otherUsername ?? '',
+          otherDisplayName: data['otherDisplayName'] as String?,
+          otherAvatarUrl: data['otherAvatarUrl'] as String?,
+        ),
+      ),
+    );
+  }
+
+  /// Abre la publicación relacionada (like/reacción o comentario) mostrando
+  /// la misma hoja de comentarios que usa el feed real. El backend sólo
+  /// manda el id en el payload, así que primero se trae el post completo
+  /// (`GET /api/core/posts/{id}`).
+  Future<void> _openPost(
+    NavigatorState navigator,
+    Map<String, dynamic> data,
+  ) async {
+    final postId =
+        (data['postId'] as num?)?.toInt() ??
+        (data['relatedId'] as num?)?.toInt();
+    if (postId == null) return;
+
+    try {
+      final post = await PostsApi.instance.getById(postId);
+      final context = navigator.context;
+      if (!context.mounted) return;
+      showBackendCommentSheet(context, post);
+    } catch (e) {
+      if (kDebugMode) debugPrint('[Zentry] no se pudo abrir post $postId: $e');
+    }
+  }
+
+  /// Abre el perfil de quien generó el evento (follow / solicitud / amistad
+  /// aceptada). Se arma un [AppUser] mínimo con lo que trae el payload;
+  /// `PublicProfileScreen` se encarga de completarlo desde el backend.
+  void _openProfile(NavigatorState navigator, Map<String, dynamic> data) {
+    final actorId = (data['actorId'] as num?)?.toInt();
+    final username =
+        (data['actorUsername'] ?? data['sourceUsername']) as String?;
+    if (actorId == null || username == null || username.isEmpty) return;
+
+    navigator.push(
+      MaterialPageRoute(
+        builder: (_) => PublicProfileScreen(
+          user: AppUser(
+            id: actorId,
+            fullName: username,
+            username: username,
+            email: '',
+            photoPath:
+                (data['actorAvatarUrl'] ?? data['sourceAvatarUrl']) as String?,
           ),
         ),
-      );
-    } catch (e) {
-      if (kDebugMode) debugPrint('[Zentry] payload de notificación inválido: $e');
-    }
+      ),
+    );
   }
 }

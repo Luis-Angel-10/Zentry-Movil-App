@@ -29,6 +29,10 @@ enum AuthFailure {
   /// El backend no encontró el usuario (HTTP 404).
   userNotFound,
 
+  /// La nueva contraseña no cumple los requisitos del backend (min. 6
+  /// caracteres) al restablecerla (HTTP 400 con `errors.newPassword`).
+  weakPassword,
+
   /// Sin conexión / timeout con el servidor.
   network,
 

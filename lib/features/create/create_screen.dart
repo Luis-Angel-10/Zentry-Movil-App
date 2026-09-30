@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
@@ -10,6 +11,7 @@ import 'package:Zentry/core/network/api_exception.dart';
 import 'package:Zentry/core/providers/auth_controller.dart';
 import 'package:Zentry/core/providers/engagement_controller.dart';
 import 'package:Zentry/core/providers/posts_controller.dart';
+import 'package:Zentry/core/providers/streak_controller.dart';
 import 'package:Zentry/l10n/generated/app_localizations.dart';
 
 import 'drawing_canvas_page.dart';
@@ -161,9 +163,21 @@ class _CreateScreenState extends State<CreateScreen>
 
   /// Publica en el backend real (`POST /api/core/posts`) para la pestaña
   /// "Nueva publicación" en los subtipos Post / Dibujo / Artículo.
-  /// Devuelve `true` si se manejó aquí; `false` si debe seguir el flujo local
-  /// (historias, reels, proyectos, colaboraciones — aún sin endpoint equivalente).
-  Future<bool> _tryPublishBackendPost(
+  ///
+  /// Devuelve `null` si este tipo de post no aplica aquí y debe seguir el
+  /// flujo local (historias, reels, proyectos, colaboraciones — aún sin
+  /// endpoint equivalente); `true` si se publicó con éxito; `false` si SÍ
+  /// era este flujo pero el backend lo rechazó (ya se mostró el error real
+  /// al usuario aquí mismo).
+  ///
+  /// CORRECCIÓN Fase 3B: antes `true` significaba indistintamente "éxito" o
+  /// "fallo pero manejado aquí", así que el llamador (`publicarContenido`)
+  /// terminaba mostrando el snackbar de ÉXITO, dando ZentryCoins y
+  /// borrando el contenido seleccionado (`limpiarContenido()`) incluso
+  /// cuando la publicación había fallado — perdiendo el video/imagen que
+  /// el usuario quería reintentar. Ahora éxito y fallo-manejado son
+  /// resultados distintos.
+  Future<bool?> _tryPublishBackendPost(
     PostsController postsController,
     AppLocalizations l10n,
   ) async {
@@ -182,13 +196,28 @@ class _CreateScreenState extends State<CreateScreen>
           ? articleTitleController.text.trim()
           : _deriveTitle(content, fallback: l10n.createPostTypeArticle);
     } else if (selectedPostType == 0 || selectedPostType == 3) {
-      // Publicación normal o dibujo (canvas)
-      contentType = selectedPostType == 3 ? 'canvas' : 'post';
+      // Publicación normal o dibujo (canvas). CORRECCIÓN Fase 3B: antes
+      // sólo se leía `selectedImage`, así que si el usuario elegía un
+      // video con el botón "Video" del tipo Publicación (selectedPostType
+      // == 0, sí permite seleccionar video — ver el picker de esta misma
+      // pantalla), ese archivo nunca se adjuntaba a la petición: el post
+      // se creaba sin ningún media y `contentType` quedaba en "post", por
+      // lo que el feed jamás tenía nada que mostrar ni forma de saber que
+      // debía tratarse como video. El backend no distingue imagen/video
+      // por sí mismo para posts (a diferencia de historias): el campo
+      // `contentType` es String libre que el servidor guarda tal cual, así
+      // que aquí es Flutter quien debe fijarlo en "video" cuando corresponda.
       content = descripcionController.text.trim();
       title = _deriveTitle(content);
-      imagePath = selectedImage?.path;
+      if (selectedPostType == 0 && selectedVideo != null) {
+        contentType = 'video';
+        imagePath = selectedVideo!.path;
+      } else {
+        contentType = selectedPostType == 3 ? 'canvas' : 'post';
+        imagePath = selectedImage?.path;
+      }
     } else {
-      return false; // historia / reel → flujo local
+      return null; // historia / reel → otro flujo (ver abajo)
     }
 
     try {
@@ -203,7 +232,7 @@ class _CreateScreenState extends State<CreateScreen>
       await postsController.refreshFeed();
       return true;
     } on ApiException catch (e) {
-      if (!mounted) return true;
+      if (!mounted) return false;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           backgroundColor: Colors.red.shade400,
@@ -217,7 +246,55 @@ class _CreateScreenState extends State<CreateScreen>
           ),
         ),
       );
-      return true; // manejado (con error): no caer al flujo local
+      return false; // manejado, pero falló: no caer al flujo local, no
+      // limpiar el contenido seleccionado (permite reintentar).
+    }
+  }
+
+  /// Historias REALES contra `POST /api/core/stories` (Fase 3B). Antes,
+  /// cualquier tipo de post en `activeTab==0` excluía `selectedPostType==1`
+  /// del flujo de backend y caía siempre al mock local — por eso una
+  /// historia publicada en un teléfono nunca aparecía en otro dispositivo.
+  /// El backend no tiene concepto de "visibilidad" para historias
+  /// (`storyVisibility` local no tiene equivalente), así que no se envía.
+  ///
+  /// Igual que [_tryPublishBackendPost]: `null` = no aplica (sigue flujo
+  /// local), `true` = éxito, `false` = falló y ya se mostró el error real;
+  /// en este último caso el llamador NO debe limpiar `selectedVideo`/
+  /// `selectedImage`, para que el usuario pueda reintentar sin volver a
+  /// elegir el archivo.
+  Future<bool?> _tryPublishBackendStory(
+    PostsController postsController,
+    AppLocalizations l10n,
+  ) async {
+    if (selectedPostType != 1) return null;
+
+    final caption = descripcionController.text.trim();
+    final filePath = selectedImage?.path ?? selectedVideo?.path;
+
+    try {
+      await postsController.createBackendStory(
+        caption: caption.isEmpty ? null : caption,
+        filePath: filePath,
+      );
+      return true;
+    } on ApiException catch (e) {
+      if (!mounted) return false;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: Colors.red.shade400,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(18),
+          ),
+          content: Text(
+            e.fieldErrors.isNotEmpty ? e.fieldErrors.values.first : e.message,
+            style: GoogleFonts.poppins(color: Colors.white),
+          ),
+        ),
+      );
+      return false; // manejado, pero falló: no caer al flujo local, no
+      // limpiar el archivo seleccionado (permite reintentar).
     }
   }
 
@@ -249,24 +326,43 @@ class _CreateScreenState extends State<CreateScreen>
 
     FocusScope.of(context).unfocus();
 
+    // Se captura antes de los awaits de publicación: si la sesión cambia
+    // mientras tanto, la publicación no se le cuenta a la cuenta nueva.
+    final authorId = context.read<AuthController>().currentUser?.id;
+
     setState(() {
       isPublishing = true;
     });
 
     // Pestaña 0 + subtipos con endpoint real: publica contra el backend.
-    if (activeTab == 0 &&
-        hasContent &&
-        selectedPostType != 1 &&
-        selectedPostType != 2) {
-      final handled = await _tryPublishBackendPost(
-        context.read<PostsController>(),
-        l10n,
-      );
-      if (handled) {
+    // Historia (selectedPostType==1) va a `/api/core/stories`; el resto
+    // (salvo colaboración, type 2, que sigue local) va a `/api/core/posts`.
+    if (activeTab == 0 && hasContent && selectedPostType != 2) {
+      final handled = selectedPostType == 1
+          ? await _tryPublishBackendStory(context.read<PostsController>(), l10n)
+          : await _tryPublishBackendPost(context.read<PostsController>(), l10n);
+      if (handled == false) {
+        // El backend rechazó la publicación: el error real ya se mostró
+        // dentro de _tryPublishBackendPost/_tryPublishBackendStory. No se
+        // limpia selectedImage/selectedVideo para permitir reintentar sin
+        // volver a elegir el archivo (corrección Fase 3B).
+        if (!mounted) return;
+        setState(() => isPublishing = false);
+        return;
+      }
+      if (handled == true) {
         if (!mounted) return;
         setState(() => isPublishing = false);
         final coinsBefore = context.read<EngagementController>().zCoins;
-        await context.read<EngagementController>().registerPost();
+        await context.read<EngagementController>().registerPost(
+          forUserId: authorId,
+        );
+        // Corrección racha: publicar SÍ cuenta como actividad para el
+        // backend (`StreakService.recordActivity`), pero sin este refresco
+        // explícito la UI (chip de Home, pantalla de racha) se quedaba
+        // mostrando el valor de antes de publicar hasta que la app pasara a
+        // segundo plano y volviera (con 30s de espera) o se reiniciara.
+        unawaited(context.read<StreakController>().load());
         final coins = context.read<EngagementController>().zCoins - coinsBefore;
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
@@ -386,8 +482,14 @@ class _CreateScreenState extends State<CreateScreen>
       }
 
       final coinsBefore = engagementController.zCoins;
-      await engagementController.registerPost();
+      await engagementController.registerPost(forUserId: authorId);
       coinsEarned = engagementController.zCoins - coinsBefore;
+      // Corrección racha: ver comentario equivalente más abajo en este mismo
+      // archivo — sin esto la racha real quedaba desactualizada hasta que la
+      // app se reabriera.
+      if (mounted) {
+        unawaited(context.read<StreakController>().load());
+      }
     }
 
     if (!mounted) return;

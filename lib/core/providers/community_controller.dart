@@ -4,7 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:Zentry/core/models/app_user.dart';
+import 'package:Zentry/core/models/backend/community_response.dart';
 import 'package:Zentry/core/models/community.dart';
+import 'package:Zentry/core/network/api_exception.dart';
+import 'package:Zentry/core/network/communities_api.dart';
 import 'package:Zentry/core/providers/notifications_controller.dart';
 
 class CommunityController extends ChangeNotifier {
@@ -13,6 +16,199 @@ class CommunityController extends ChangeNotifier {
   static const _requestsKey = 'community_join_requests_data';
 
   NotificationsController? notifications;
+  final CommunitiesApi _api = CommunitiesApi.instance;
+
+  // ══════════════════════════════════════════════════════════════════════
+  //  COMUNIDADES REALES DEL BACKEND (`/api/core/communities`) — Fase 2
+  //
+  //  Fuente de verdad para cualquier comunidad creada/consultada desde esta
+  //  fase en adelante: sobrevive cierre de app, reinstalación y cambio de
+  //  dispositivo porque vive en Postgres, no en SharedPreferences.
+  //
+  //  `communities`/`memberships`/`joinRequests` de abajo (el sistema local
+  //  original, con privacidad/moderadores/aprobación de ingreso — conceptos
+  //  que el backend NO tiene) se conserva sin borrar por si queda algún dato
+  //  de sesiones anteriores, pero ninguna pantalla nueva lo alimenta ya.
+  // ══════════════════════════════════════════════════════════════════════
+  final List<CommunityResponse> backendCommunities = [];
+  bool communitiesLoading = false;
+  String? communitiesError;
+  bool communitiesLoaded = false;
+
+  CommunityResponse? selectedCommunity;
+  bool selectedCommunityLoading = false;
+  String? selectedCommunityError;
+
+  final Set<String> _joinInFlight = {};
+
+  Future<void> loadBackendCommunities({String? search}) async {
+    communitiesLoading = true;
+    communitiesError = null;
+    notifyListeners();
+    try {
+      final result = await _api.getCommunities(search: search, size: 50);
+      backendCommunities
+        ..clear()
+        ..addAll(result.items);
+      communitiesLoaded = true;
+      for (final c in result.items) {
+        _communityNameCache[c.id] = c.nombre;
+      }
+    } on ApiException catch (e) {
+      communitiesError = e.message;
+    } finally {
+      communitiesLoading = false;
+      notifyListeners();
+    }
+  }
+
+  /// Comunidades a las que el usuario autenticado REALMENTE pertenece.
+  ///
+  /// CORRECCIÓN: la pestaña "Comunidades" del perfil mostraba
+  /// "Aún no perteneces a ninguna comunidad" incluso cuando el usuario sí
+  /// era miembro, porque leía de `myCommunities()` (sistema local legado de
+  /// abajo, que ninguna pantalla nueva alimenta — ver su doc-comment). El
+  /// backend no tiene un endpoint dedicado "mis comunidades"
+  /// (confirmado por lectura de `CommunityController.java`): `GET
+  /// /api/core/communities` devuelve TODAS las comunidades con `isJoined`
+  /// calculado por-usuario, así que "las mías" se obtiene filtrando esa
+  /// misma lista ya cargada — sin inventar ni duplicar un endpoint nuevo.
+  ///
+  /// LIMITACIÓN documentada: si hay más de 50 comunidades en total (tamaño
+  /// de página usado en `loadBackendCommunities`), una comunidad unida que
+  /// quedó fuera de esa página no aparecería aquí — el backend no expone
+  /// paginación completa "sólo las mías" para evitarlo. No aplica con el
+  /// volumen de datos actual.
+  List<CommunityResponse> get backendMyCommunities =>
+      backendCommunities.where((c) => c.isJoined).toList();
+
+  final Map<int, String> _communityNameCache = {};
+
+  /// Nombre de una comunidad por id, para mostrar "publicó en `<comunidad>`"
+  /// en el feed. `PostResponse.communityId` es sólo el id numérico (el
+  /// backend NO incluye `communityName` en ese DTO — confirmado por
+  /// lectura de `PostResponse.java`), así que Flutter debe resolverlo por
+  /// separado. Se cachea porque el mismo id se repite en muchos posts.
+  String? communityNameFor(int id) => _communityNameCache[id];
+
+  final Set<int> _communityNameLookupInFlight = {};
+
+  /// Resuelve y cachea el nombre de una comunidad si todavía no se conoce
+  /// (p. ej. porque no estaba entre las primeras 50 de
+  /// `loadBackendCommunities`). Notifica una sola vez al terminar.
+  Future<void> ensureCommunityName(int id) async {
+    if (_communityNameCache.containsKey(id) ||
+        _communityNameLookupInFlight.contains(id)) {
+      return;
+    }
+    _communityNameLookupInFlight.add(id);
+    try {
+      final community = await _api.getCommunity(id.toString());
+      _communityNameCache[id] = community.nombre;
+      notifyListeners();
+    } on ApiException {
+      // Sin nombre disponible: el feed simplemente no muestra la línea de
+      // comunidad para este post en vez de inventar un nombre.
+    } finally {
+      _communityNameLookupInFlight.remove(id);
+    }
+  }
+
+  Future<void> loadCommunityDetail(String identifier) async {
+    selectedCommunityLoading = true;
+    selectedCommunityError = null;
+    selectedCommunity = null;
+    notifyListeners();
+    try {
+      selectedCommunity = await _api.getCommunity(identifier);
+    } on ApiException catch (e) {
+      selectedCommunityError = e.message;
+    } finally {
+      selectedCommunityLoading = false;
+      notifyListeners();
+    }
+  }
+
+  /// Crea una comunidad real. Si hay imágenes locales, hace un segundo
+  /// llamado (`updateCommunity` multipart) para subir avatar/banner —
+  /// el backend no acepta ambas cosas en la misma llamada de creación.
+  Future<CommunityResponse> createBackendCommunity({
+    required String nombre,
+    String? descripcion,
+    String? categoria,
+    List<String> rules = const [],
+    String? avatarPath,
+    String? bannerPath,
+  }) async {
+    var created = await _api.createCommunity(
+      nombre: nombre,
+      descripcion: descripcion,
+      categoria: categoria,
+      rules: rules,
+    );
+
+    if ((avatarPath != null && avatarPath.isNotEmpty) ||
+        (bannerPath != null && bannerPath.isNotEmpty)) {
+      try {
+        created = await _api.updateCommunity(
+          created.identifier,
+          avatarPath: avatarPath,
+          bannerPath: bannerPath,
+        );
+      } on ApiException {
+        // La comunidad ya existe en el servidor; si sólo falla la subida de
+        // imagen no se pierde la creación, se conserva sin avatar/banner.
+      }
+    }
+
+    backendCommunities.insert(0, created);
+    notifyListeners();
+    return created;
+  }
+
+  /// Une/desune al usuario actual de forma optimista, reconciliando siempre
+  /// con la respuesta real del backend (nunca confía sólo en Flutter).
+  Future<String?> toggleJoinBackend(CommunityResponse community) async {
+    final identifier = community.identifier;
+    if (_joinInFlight.contains(identifier)) return null;
+    _joinInFlight.add(identifier);
+
+    final wasJoined = community.isJoined;
+    final optimistic = community.copyWith(
+      isJoined: !wasJoined,
+      membersCount: wasJoined
+          ? (community.membersCount - 1).clamp(0, 1 << 31)
+          : community.membersCount + 1,
+    );
+    _applyCommunityUpdate(optimistic);
+    notifyListeners();
+
+    try {
+      final result = wasJoined
+          ? await _api.leaveCommunity(identifier)
+          : await _api.joinCommunity(identifier);
+      _applyCommunityUpdate(result);
+      notifyListeners();
+      return null;
+    } on ApiException catch (e) {
+      _applyCommunityUpdate(community);
+      notifyListeners();
+      return e.message;
+    } finally {
+      _joinInFlight.remove(identifier);
+    }
+  }
+
+  void _applyCommunityUpdate(CommunityResponse updated) {
+    final i = backendCommunities.indexWhere((c) => c.id == updated.id);
+    if (i != -1) backendCommunities[i] = updated;
+    if (selectedCommunity?.id == updated.id) selectedCommunity = updated;
+  }
+
+  // ══════════════════════════════════════════════════════════════════════
+  //  SISTEMA LOCAL LEGADO (privacidad/moderadores/solicitudes de ingreso)
+  //  Ver doc-comment de arriba: no lo alimenta ninguna pantalla nueva.
+  // ══════════════════════════════════════════════════════════════════════
 
   final List<Community> communities = [];
   final List<CommunityMember> memberships = [];

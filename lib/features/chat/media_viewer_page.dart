@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:open_filex/open_filex.dart';
 import 'package:video_player/video_player.dart';
 
+import 'package:Zentry/core/video/zentry_video_decoder_coordinator.dart';
 import 'package:Zentry/l10n/generated/app_localizations.dart';
 
 class MediaViewerPage extends StatefulWidget {
@@ -246,10 +247,13 @@ class FullScreenVideo extends StatefulWidget {
 }
 
 class _FullScreenVideoState extends State<FullScreenVideo> {
+  static const _maxAttempts = 3; // intento inicial + 2 reintentos
+
   VideoPlayerController? controller;
   bool showControls = true;
   bool _error = false;
   bool _muted = false;
+  int _attempt = 0;
 
   @override
   void initState() {
@@ -258,18 +262,38 @@ class _FullScreenVideoState extends State<FullScreenVideo> {
   }
 
   Future<void> _init() async {
+    if (!mounted) return;
+    _attempt++;
     final c = widget.file != null
         ? VideoPlayerController.file(widget.file!)
         : VideoPlayerController.networkUrl(Uri.parse(widget.networkUrl!));
-    controller = c;
-    c.addListener(_onTick);
     try {
-      await c.initialize();
-      if (!mounted) return;
+      // Serializado con cualquier otro video de la app (feed/stories): ver
+      // ZentryVideoDecoderCoordinator — evita pedirle al SO dos decoders al
+      // mismo tiempo, causa real confirmada por logcat en hardware con
+      // pocos decoders concurrentes (p. ej. tablets Huawei/HiSilicon).
+      await ZentryVideoDecoderCoordinator.instance.runExclusive(c.initialize);
+      if (!mounted) {
+        c.dispose();
+        return;
+      }
+      controller = c;
+      c.addListener(_onTick);
       if (widget.autoplay) c.play();
       setState(() {});
-    } catch (_) {
+    } catch (e) {
+      c.dispose();
+      debugPrint(
+        '[Zentry][video] fullscreen: falló inicialización '
+        '(intento $_attempt/$_maxAttempts): $e',
+      );
       if (!mounted) return;
+      if (_attempt < _maxAttempts) {
+        await Future.delayed(Duration(milliseconds: 350 * _attempt));
+        if (!mounted) return;
+        await _init();
+        return;
+      }
       setState(() => _error = true);
     }
   }

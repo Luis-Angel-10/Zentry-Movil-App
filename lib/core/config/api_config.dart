@@ -81,13 +81,23 @@ class ApiConfig {
     return '$baseUrl/$p';
   }
 
+  /// ── ÚNICO PUNTO A CAMBIAR si la IP de la laptop cambia (DHCP) ──
+  /// IP LAN de la laptop donde corre Spring Boot en las pruebas físicas
+  /// (Wi-Fi "Centro Computo"). NO es la IP de ningún teléfono cliente
+  /// (192.168.1.71 / 192.168.1.72). Es SOLO el host, sin puerto: el puerto lo
+  /// aporta [devPort] al construirse la URL en [_defaultForPlatform] (ver
+  /// [baseUrl] y [wsUrl]); si cambia, añade también el nuevo host en
+  /// android/app/src/debug/res/xml/network_security_config.xml.
+  /// Para un emulador usa `--dart-define=ZENTRY_API_BASE_URL=http://10.0.2.2:8080`.
+  static const String lanServerHost = '192.168.1.71';
+
   static String _defaultForPlatform() {
     if (kIsWeb) return 'http://localhost:$devPort';
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
         return _androidUsesAdbReverse
             ? 'http://localhost:$devPort'
-            : 'http://10.0.2.2:$devPort';
+            : 'http://$lanServerHost:$devPort';
       case TargetPlatform.iOS:
       case TargetPlatform.macOS:
       case TargetPlatform.windows:

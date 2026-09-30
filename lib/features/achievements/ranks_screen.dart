@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:Zentry/core/models/achievement.dart';
 import 'package:Zentry/core/providers/auth_controller.dart';
 import 'package:Zentry/core/providers/engagement_controller.dart';
+import 'package:Zentry/core/providers/streak_controller.dart';
 import 'package:Zentry/core/services/progress_pdf_service.dart';
 import 'package:Zentry/l10n/generated/app_localizations.dart';
 
@@ -125,6 +126,7 @@ class _RanksScreenState extends State<RanksScreen>
   Future<void> _exportPdf(
     AppLocalizations l10n,
     EngagementController engagement,
+    StreakController streak,
     int points,
   ) async {
     setState(() => _exporting = true);
@@ -139,8 +141,8 @@ class _RanksScreenState extends State<RanksScreen>
       await ProgressPdfService.exportAndOpen(
         userDisplayName: userName,
         points: points,
-        streakCount: engagement.streakCount,
-        bestStreak: engagement.bestStreak,
+        streakCount: streak.currentStreak,
+        bestStreak: streak.longestStreak,
         unlockedAchievements: unlocked,
         titleFor: (id) => _achievementTitle(l10n, id),
         docTitle: l10n.pdfDocTitle,
@@ -152,8 +154,8 @@ class _RanksScreenState extends State<RanksScreen>
         achievementsTitle: l10n.pdfDocAchievementsTitle,
         noAchievementsLabel: l10n.pdfDocNoAchievements,
         streakLabel: l10n.pdfDocStreakLabel(
-          engagement.streakCount,
-          engagement.bestStreak,
+          streak.currentStreak,
+          streak.longestStreak,
         ),
       );
       if (mounted) {
@@ -176,6 +178,7 @@ class _RanksScreenState extends State<RanksScreen>
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final engagement = context.watch<EngagementController>();
+    final streak = context.watch<StreakController>();
     final myRank = currentRank(widget.currentPoints);
     final next = nextRank(widget.currentPoints);
 
@@ -195,7 +198,12 @@ class _RanksScreenState extends State<RanksScreen>
           OutlinedButton.icon(
             onPressed: _exporting
                 ? null
-                : () => _exportPdf(l10n, engagement, widget.currentPoints),
+                : () => _exportPdf(
+                    l10n,
+                    engagement,
+                    streak,
+                    widget.currentPoints,
+                  ),
             icon: _exporting
                 ? const SizedBox(
                     width: 16,

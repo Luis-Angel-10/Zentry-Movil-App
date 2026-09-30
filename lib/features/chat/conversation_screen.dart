@@ -11,6 +11,7 @@ import 'package:Zentry/core/network/messages_api.dart';
 import 'package:Zentry/core/network/realtime_client.dart';
 import 'package:Zentry/core/providers/auth_controller.dart';
 import 'package:Zentry/core/services/notification_service.dart';
+import 'package:Zentry/l10n/generated/app_localizations.dart';
 import 'package:Zentry/theme/theme_controller.dart';
 
 /// Conversación 1 a 1 REAL contra el backend
@@ -353,10 +354,26 @@ class _ConversationScreenState extends State<ConversationScreen> {
     );
   }
 
+  /// Parte una respuesta a historia real (`type:"story"`) en su preview
+  /// citado y el texto real de la respuesta. El backend guarda esto como
+  /// texto plano con el formato literal
+  /// `↩️ "preview": respuesta` (o `↩️ respuesta` si la historia no tenía
+  /// preview) — ver `StoryService.replyToStory` (sin modificar, sólo
+  /// leído). No hay `storyId` ni URL de la historia en el mensaje
+  /// (confirmado: `Message` no tiene esos campos), así que sólo se puede
+  /// mostrar el texto citado, no una miniatura real de la historia.
+  static final RegExp _storyReplyPattern = RegExp(r'^↩️ (?:"(.*)": )?(.*)$');
+
   Widget _bubble(MessageResponse msg, Color accentColor) {
     // Comparación explícita de enteros: senderId (backend Integer) contra
     // currentUser.id (int, mismo tipo desde la Fase 1 — nunca String/UUID).
     final isMe = _myId != null && msg.senderId == _myId;
+    final isStoryReply = msg.type == 'story';
+    final storyMatch = isStoryReply
+        ? _storyReplyPattern.firstMatch(msg.content ?? '')
+        : null;
+    final storyPreview = storyMatch?.group(1);
+    final replyText = storyMatch?.group(2) ?? msg.content ?? '';
 
     return Align(
       alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
@@ -388,8 +405,60 @@ class _ConversationScreenState extends State<ConversationScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
+              if (isStoryReply) ...[
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.reply_rounded,
+                      size: 13,
+                      color: Colors.white.withOpacity(0.7),
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      isMe
+                          ? AppLocalizations.of(context)!.chatRepliedToStory
+                          : AppLocalizations.of(
+                              context,
+                            )!.chatRepliedToYourStory,
+                      style: TextStyle(
+                        color: Colors.white.withOpacity(0.7),
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+                if ((storyPreview ?? '').isNotEmpty) ...[
+                  const SizedBox(height: 6),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 8,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.black26,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border(
+                        left: BorderSide(color: accentColor, width: 3),
+                      ),
+                    ),
+                    child: Text(
+                      storyPreview!,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: Colors.white.withValues(alpha: 0.85),
+                        fontSize: 13,
+                        fontStyle: FontStyle.italic,
+                      ),
+                    ),
+                  ),
+                ],
+                const SizedBox(height: 6),
+              ],
               Text(
-                msg.content ?? '',
+                replyText,
                 style: const TextStyle(color: Colors.white, fontSize: 15),
               ),
               const SizedBox(height: 4),

@@ -3,6 +3,7 @@ import 'dart:ui';
 
 import 'package:Zentry/core/providers/auth_controller.dart';
 import 'package:Zentry/core/providers/engagement_controller.dart';
+import 'package:Zentry/core/providers/wallet_controller.dart';
 import 'package:Zentry/features/achievements/achievements_screen.dart';
 import 'package:Zentry/features/profile/edit_profile_screen.dart';
 import 'package:Zentry/features/profile/personalize_profile_screen.dart';
@@ -19,6 +20,7 @@ import 'package:Zentry/features/settings/security_screen.dart';
 import 'package:Zentry/features/settings/settings_screen.dart';
 import 'package:Zentry/features/subscription/subscription_screen.dart';
 import 'package:Zentry/features/support/support_screen.dart';
+import 'package:Zentry/features/wallet/wallet_screen.dart';
 import 'package:Zentry/features/communities/communities_screen.dart';
 import 'package:Zentry/features/events/events_screen.dart';
 import 'package:Zentry/features/friends/friends_screen.dart';
@@ -136,6 +138,13 @@ class _ProfileMenuScreenState extends State<ProfileMenuScreen>
     Navigator.push(
       context,
       MaterialPageRoute(builder: (_) => const StoreScreen()),
+    );
+  }
+
+  void goWallet() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const WalletScreen()),
     );
   }
 
@@ -487,11 +496,21 @@ class _ProfileMenuScreenState extends State<ProfileMenuScreen>
                           ),
                           menuCard(
                             icon: Icons.monetization_on_outlined,
+                            // Saldo REAL del backend (GET /api/core/wallet),
+                            // no el contador local de EngagementController.
+                            title: l10n.walletMenuItem(
+                              context.watch<WalletController>().balanceLabel,
+                            ),
+                            onTap: goWallet,
+                            color: Colors.yellowAccent,
+                          ),
+                          menuCard(
+                            icon: Icons.storefront_outlined,
                             title: l10n.profileMenuZCoinsItem(
                               context.watch<EngagementController>().zCoins,
                             ),
                             onTap: goStore,
-                            color: Colors.yellowAccent,
+                            color: Colors.amberAccent,
                           ),
                           menuCard(
                             icon: Icons.bar_chart_outlined,

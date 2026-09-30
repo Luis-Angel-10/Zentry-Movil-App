@@ -19,7 +19,10 @@ import 'package:Zentry/core/providers/follow_controller.dart';
 import 'package:Zentry/core/providers/notifications_controller.dart';
 import 'package:Zentry/core/providers/portfolio_controller.dart';
 import 'package:Zentry/core/providers/posts_controller.dart';
+import 'package:Zentry/core/providers/streak_controller.dart';
 import 'package:Zentry/core/providers/virtual_pet_controller.dart';
+import 'package:Zentry/core/providers/wallet_controller.dart';
+import 'package:Zentry/core/services/fcm_service.dart';
 import 'package:Zentry/core/services/notification_service.dart';
 import 'package:Zentry/theme/theme_controller.dart';
 import 'package:Zentry/theme/app_theme.dart';
@@ -28,7 +31,6 @@ import 'package:Zentry/l10n/generated/app_localizations.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Cliente HTTP y almacenamiento seguro del JWT listos antes de arrancar la UI.
   ApiClient.instance.init();
   await TokenStorage.instance.warmUp();
 
@@ -78,6 +80,8 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => CreativeChallengeController()),
         ChangeNotifierProvider(create: (_) => NotificationsController()),
         ChangeNotifierProvider(create: (_) => VirtualPetController()),
+        ChangeNotifierProvider(create: (_) => StreakController()),
+        ChangeNotifierProvider(create: (_) => WalletController()),
       ],
       child: const ZentryApp(),
     );
@@ -91,13 +95,38 @@ class ZentryApp extends StatefulWidget {
   State<ZentryApp> createState() => _ZentryAppState();
 }
 
-class _ZentryAppState extends State<ZentryApp> {
+class _ZentryAppState extends State<ZentryApp> with WidgetsBindingObserver {
   bool _isLoading = true;
+  DateTime? _lastResumeRefresh;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _loadInitialData();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (!mounted || state != AppLifecycleState.resumed || _isLoading) return;
+
+    final now = DateTime.now();
+    if (_lastResumeRefresh != null &&
+        now.difference(_lastResumeRefresh!) < const Duration(seconds: 30)) {
+      return;
+    }
+    _lastResumeRefresh = now;
+
+    final auth = context.read<AuthController>();
+    if (!auth.isLoggedIn) return;
+    context.read<StreakController>().load();
+    context.read<PostsController>().loadBackendStories();
   }
 
   Future<void> _loadInitialData() async {
@@ -114,20 +143,57 @@ class _ZentryAppState extends State<ZentryApp> {
     final creativeChallengeController = context
         .read<CreativeChallengeController>();
     final virtualPetController = context.read<VirtualPetController>();
+    final streakController = context.read<StreakController>();
+    final walletController = context.read<WalletController>();
 
     engagementController.notifications = notificationsController;
     postsController.notifications = notificationsController;
     communityController.notifications = notificationsController;
     collaborationController.notifications = notificationsController;
 
-    // Cuando el backend invalida la sesión (401/403), limpiar y volver al login.
     ApiClient.instance.onSessionInvalid = authController.handleSessionInvalid;
+
+    // La racha real del backend alimenta los logros `streak_*` y el reto
+    // semanal de racha de EngagementController (que ya no tiene contador de
+    // racha propio). syncBackendStreak ignora respuestas de otra cuenta.
+    void syncStreakIntoEngagement() {
+      final data = streakController.data;
+      if (data == null) return;
+      engagementController.syncBackendStreak(
+        userId: data.userId,
+        currentStreak: data.currentStreak,
+        longestStreak: data.longestStreak,
+      );
+    }
+
+    streakController.addListener(syncStreakIntoEngagement);
+
+    // Engagement por usuario: se carga sólo el namespace del usuario
+    // autenticado (ver EngagementController.bindUser).
+    Future<void> bindEngagement() async {
+      await engagementController.bindUser(authController.currentUser?.id);
+      syncStreakIntoEngagement();
+    }
+
+    authController.onSessionEstablished = () {
+      // Racha por usuario: se descarta cualquier valor de la cuenta anterior
+      // antes de pedir la del usuario que acaba de entrar.
+      streakController.reset();
+      unawaited(streakController.load());
+      unawaited(bindEngagement());
+      unawaited(walletController.load());
+      unawaited(postsController.loadBackendStories());
+    };
+
+    authController.onSessionCleared = () {
+      streakController.reset();
+      unawaited(engagementController.bindUser(null));
+    };
 
     await Future.wait([
       themeController.load(),
       localeProvider.load(),
       authController.load(),
-      engagementController.load(),
       postsController.load(),
       notificationsController.load(),
       communityController.load(),
@@ -139,9 +205,17 @@ class _ZentryAppState extends State<ZentryApp> {
       NotificationService.instance.init(),
     ]);
 
-    // Lectura del feed real (no bloquea el arranque: si el backend no responde
-    // se conserva el feed local y `feedError` queda disponible para la UI).
+    // Tras authController.load() ya se sabe qué usuario (si hay) restauró
+    // sesión; antes de eso no hay namespace que cargar.
+    unawaited(bindEngagement());
+
+    unawaited(FcmService.instance.init());
+
     unawaited(postsController.syncFromBackend());
+
+    unawaited(streakController.load());
+    unawaited(walletController.load());
+    unawaited(postsController.loadBackendStories());
 
     if (mounted) {
       setState(() {

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'package:Zentry/core/providers/engagement_controller.dart';
+import 'package:Zentry/core/providers/streak_controller.dart';
 import 'package:Zentry/l10n/generated/app_localizations.dart';
 
 const List<String> _kDayLetters = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
@@ -41,9 +41,32 @@ class _StreakScreenState extends State<StreakScreen>
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final engagement = context.watch<EngagementController>();
-    final active = engagement.isStreakActiveToday;
-    final activity = engagement.weeklyStreakActivity;
+    final streak = context.watch<StreakController>();
+    final status = streak.status;
+    final activity = streak.weeklyActivity;
+
+    // 4 estados reales (corrección): antes sólo existían "encendida"/"apagada",
+    // sin distinguir "nunca empezada" de "vigente pero pendiente hoy" de
+    // "perdida" — ver StreakController.status.
+    final bool isActive = status == StreakStatus.activeToday;
+    final bool isPending = status == StreakStatus.pendingToday;
+    final List<Color> gradient = switch (status) {
+      StreakStatus.activeToday => [Colors.deepOrange, Colors.amber],
+      StreakStatus.pendingToday => [
+        Colors.deepOrange.shade900,
+        Colors.orange.shade800,
+      ],
+      StreakStatus.neverStarted ||
+      StreakStatus.lost => [Colors.grey.shade900, Colors.grey.shade800],
+    };
+    final String subtitle = switch (status) {
+      StreakStatus.activeToday => l10n.streakScreenActiveToday,
+      StreakStatus.pendingToday => l10n.streakScreenPendingToday(
+        streak.currentStreak,
+      ),
+      StreakStatus.neverStarted ||
+      StreakStatus.lost => l10n.streakScreenInactiveToday,
+    };
 
     return Scaffold(
       appBar: AppBar(
@@ -58,25 +81,25 @@ class _StreakScreenState extends State<StreakScreen>
             padding: const EdgeInsets.symmetric(vertical: 32),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(24),
-              gradient: LinearGradient(
-                colors: active
-                    ? [Colors.deepOrange, Colors.amber]
-                    : [Colors.grey.shade900, Colors.grey.shade800],
-              ),
+              gradient: LinearGradient(colors: gradient),
             ),
             child: Column(
               children: [
                 ScaleTransition(
-                  scale: active ? _pulse : const AlwaysStoppedAnimation(1.0),
+                  scale: isActive ? _pulse : const AlwaysStoppedAnimation(1.0),
                   child: Icon(
                     Icons.local_fire_department,
-                    color: active ? Colors.white : Colors.white24,
+                    color: isActive
+                        ? Colors.white
+                        : isPending
+                        ? Colors.white70
+                        : Colors.white24,
                     size: 84,
                   ),
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  l10n.achievementsStreakDaysLabel(engagement.streakCount),
+                  l10n.achievementsStreakDaysLabel(streak.currentStreak),
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 28,
@@ -84,13 +107,19 @@ class _StreakScreenState extends State<StreakScreen>
                   ),
                 ),
                 const SizedBox(height: 6),
-                Text(
-                  active
-                      ? l10n.streakScreenActiveToday
-                      : l10n.streakScreenInactiveToday,
-                  style: TextStyle(
-                    color: active ? Colors.white : Colors.white54,
-                    fontWeight: FontWeight.w600,
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: Text(
+                    subtitle,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: isActive
+                          ? Colors.white
+                          : isPending
+                          ? Colors.white70
+                          : Colors.white54,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
               ],
@@ -99,14 +128,26 @@ class _StreakScreenState extends State<StreakScreen>
 
           const SizedBox(height: 20),
 
+          // Corrección racha: se quitó la 3ra tarjeta ("puntos de racha
+          // acumulados"), que leía `EngagementController.streakPoints` — un
+          // contador local en SharedPreferences que sólo avanzaba con
+          // like/comentario/publicación (no con seguir, unirse a una
+          // comunidad, etc.) y comparaba fechas con la hora LOCAL del
+          // dispositivo, mientras el resto de esta pantalla ya usa la racha
+          // REAL del backend (hora UTC, cuenta más tipos de actividad). Esa
+          // mezcla es lo que hacía ver la racha "bugeada": los días de arriba
+          // coincidían con el backend, pero este número no. El backend no
+          // expone un total histórico de puntos de racha, así que en vez de
+          // inventarlo se deja sólo lo que sí es real: récord y recompensa
+          // de hoy.
           Row(
             children: [
               Expanded(
                 child: _statCard(
                   Icons.emoji_events,
                   Colors.amber,
-                  '${engagement.bestStreak}',
-                  l10n.achievementsStreakBestLabel(engagement.bestStreak),
+                  '${streak.longestStreak}',
+                  l10n.achievementsStreakBestLabel(streak.longestStreak),
                 ),
               ),
               const SizedBox(width: 12),
@@ -114,21 +155,8 @@ class _StreakScreenState extends State<StreakScreen>
                 child: _statCard(
                   Icons.bolt,
                   Colors.deepOrange,
-                  '+${engagement.todayStreakReward}',
-                  l10n.achievementsStreakRewardLabel(
-                    engagement.todayStreakReward,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _statCard(
-                  Icons.stars,
-                  Colors.purpleAccent,
-                  '${engagement.streakPoints}',
-                  l10n.achievementsStreakPointsTotalLabel(
-                    engagement.streakPoints,
-                  ),
+                  '+${streak.todayReward}',
+                  l10n.achievementsStreakRewardLabel(streak.todayReward),
                 ),
               ),
             ],

@@ -837,6 +837,18 @@ abstract class AppLocalizations {
   /// **'Tu historia'**
   String get homeAddStoryLabel;
 
+  /// No description provided for @homeStoriesLoading.
+  ///
+  /// In es_MX, this message translates to:
+  /// **'Cargando…'**
+  String get homeStoriesLoading;
+
+  /// No description provided for @homeStoriesRetry.
+  ///
+  /// In es_MX, this message translates to:
+  /// **'Reintentar'**
+  String get homeStoriesRetry;
+
   /// No description provided for @storyVisibilityPublic.
   ///
   /// In es_MX, this message translates to:
@@ -878,6 +890,18 @@ abstract class AppLocalizations {
   /// In es_MX, this message translates to:
   /// **'Respondió a tu historia: {text}'**
   String storyReplyMessagePrefix(String text);
+
+  /// No description provided for @chatRepliedToStory.
+  ///
+  /// In es_MX, this message translates to:
+  /// **'Respondiste a su historia'**
+  String get chatRepliedToStory;
+
+  /// No description provided for @chatRepliedToYourStory.
+  ///
+  /// In es_MX, this message translates to:
+  /// **'Respondió a tu historia'**
+  String get chatRepliedToYourStory;
 
   /// No description provided for @storyDeleteConfirmTitle.
   ///
@@ -1070,6 +1094,18 @@ abstract class AppLocalizations {
   /// In es_MX, this message translates to:
   /// **'Unirse'**
   String get communitiesJoinLabel;
+
+  /// No description provided for @communitiesRoleOwner.
+  ///
+  /// In es_MX, this message translates to:
+  /// **'Creador'**
+  String get communitiesRoleOwner;
+
+  /// No description provided for @communitiesMembersCount.
+  ///
+  /// In es_MX, this message translates to:
+  /// **'{count, plural, =0{Sin miembros} one{1 miembro} other{{count} miembros}}'**
+  String communitiesMembersCount(int count);
 
   /// No description provided for @communitiesEmptyTitle.
   ///
@@ -1368,7 +1404,7 @@ abstract class AppLocalizations {
   /// No description provided for @communityDetailRulesTitle.
   ///
   /// In es_MX, this message translates to:
-  /// **'Reglas'**
+  /// **'Reglas de la comunidad'**
   String get communityDetailRulesTitle;
 
   /// No description provided for @communityDetailNoRules.
@@ -3705,6 +3741,12 @@ abstract class AppLocalizations {
   /// **'Da like, comenta o publica para encenderla hoy'**
   String get streakScreenInactiveToday;
 
+  /// No description provided for @streakScreenPendingToday.
+  ///
+  /// In es_MX, this message translates to:
+  /// **'Tu racha de {count} días sigue viva. Actúa hoy para conservarla'**
+  String streakScreenPendingToday(int count);
+
   /// No description provided for @streakScreenWeekTitle.
   ///
   /// In es_MX, this message translates to:
@@ -5498,6 +5540,552 @@ abstract class AppLocalizations {
   /// In es_MX, this message translates to:
   /// **'Racha actual: {days} días (mejor racha: {best})'**
   String pdfDocStreakLabel(int days, int best);
+
+  /// No description provided for @authForgotPasswordTitle.
+  ///
+  /// In es_MX, this message translates to:
+  /// **'¿Olvidaste tu contraseña?'**
+  String get authForgotPasswordTitle;
+
+  /// No description provided for @authForgotPasswordSubtitle.
+  ///
+  /// In es_MX, this message translates to:
+  /// **'Ingresa tu correo y te enviaremos un código para restablecer tu contraseña.'**
+  String get authForgotPasswordSubtitle;
+
+  /// No description provided for @authForgotPasswordEmailHint.
+  ///
+  /// In es_MX, this message translates to:
+  /// **'Correo electrónico'**
+  String get authForgotPasswordEmailHint;
+
+  /// No description provided for @authForgotPasswordEmailInvalid.
+  ///
+  /// In es_MX, this message translates to:
+  /// **'Ingresa un correo válido'**
+  String get authForgotPasswordEmailInvalid;
+
+  /// No description provided for @authForgotPasswordSubmitButton.
+  ///
+  /// In es_MX, this message translates to:
+  /// **'Enviar código'**
+  String get authForgotPasswordSubmitButton;
+
+  /// No description provided for @authForgotPasswordBackToLogin.
+  ///
+  /// In es_MX, this message translates to:
+  /// **'Volver a iniciar sesión'**
+  String get authForgotPasswordBackToLogin;
+
+  /// No description provided for @authForgotPasswordUserNotFoundError.
+  ///
+  /// In es_MX, this message translates to:
+  /// **'No existe una cuenta con ese correo electrónico.'**
+  String get authForgotPasswordUserNotFoundError;
+
+  /// No description provided for @authForgotPasswordNetworkError.
+  ///
+  /// In es_MX, this message translates to:
+  /// **'Sin conexión con el servidor. Verifica tu red.'**
+  String get authForgotPasswordNetworkError;
+
+  /// No description provided for @authForgotPasswordServerError.
+  ///
+  /// In es_MX, this message translates to:
+  /// **'Error del servidor. Inténtalo más tarde.'**
+  String get authForgotPasswordServerError;
+
+  /// No description provided for @authForgotPasswordGenericError.
+  ///
+  /// In es_MX, this message translates to:
+  /// **'No se pudo enviar el código. Inténtalo de nuevo.'**
+  String get authForgotPasswordGenericError;
+
+  /// No description provided for @authForgotPasswordSuccessMessage.
+  ///
+  /// In es_MX, this message translates to:
+  /// **'Contraseña restablecida. Inicia sesión con tu nueva contraseña.'**
+  String get authForgotPasswordSuccessMessage;
+
+  /// No description provided for @authResetPasswordTitle.
+  ///
+  /// In es_MX, this message translates to:
+  /// **'Restablece tu contraseña'**
+  String get authResetPasswordTitle;
+
+  /// No description provided for @authResetPasswordSubtitle.
+  ///
+  /// In es_MX, this message translates to:
+  /// **'Escribe el código de 6 dígitos que enviamos a\n{email} y elige tu nueva contraseña.'**
+  String authResetPasswordSubtitle(String email);
+
+  /// No description provided for @authResetPasswordCodeLengthError.
+  ///
+  /// In es_MX, this message translates to:
+  /// **'El código tiene 6 dígitos'**
+  String get authResetPasswordCodeLengthError;
+
+  /// No description provided for @authResetPasswordNewPasswordHint.
+  ///
+  /// In es_MX, this message translates to:
+  /// **'Nueva contraseña'**
+  String get authResetPasswordNewPasswordHint;
+
+  /// No description provided for @authResetPasswordMinLengthError.
+  ///
+  /// In es_MX, this message translates to:
+  /// **'Mínimo 6 caracteres'**
+  String get authResetPasswordMinLengthError;
+
+  /// No description provided for @authResetPasswordConfirmHint.
+  ///
+  /// In es_MX, this message translates to:
+  /// **'Confirmar contraseña'**
+  String get authResetPasswordConfirmHint;
+
+  /// No description provided for @authResetPasswordMismatchError.
+  ///
+  /// In es_MX, this message translates to:
+  /// **'Las contraseñas no coinciden'**
+  String get authResetPasswordMismatchError;
+
+  /// No description provided for @authResetPasswordSubmitButton.
+  ///
+  /// In es_MX, this message translates to:
+  /// **'Restablecer contraseña'**
+  String get authResetPasswordSubmitButton;
+
+  /// No description provided for @authResetPasswordResendCooldown.
+  ///
+  /// In es_MX, this message translates to:
+  /// **'Reenviar código en {seconds} s'**
+  String authResetPasswordResendCooldown(int seconds);
+
+  /// No description provided for @authResetPasswordResendButton.
+  ///
+  /// In es_MX, this message translates to:
+  /// **'Reenviar código'**
+  String get authResetPasswordResendButton;
+
+  /// No description provided for @authResetPasswordBackButton.
+  ///
+  /// In es_MX, this message translates to:
+  /// **'Volver'**
+  String get authResetPasswordBackButton;
+
+  /// No description provided for @authResetPasswordSuccessMessage.
+  ///
+  /// In es_MX, this message translates to:
+  /// **'Contraseña restablecida correctamente.'**
+  String get authResetPasswordSuccessMessage;
+
+  /// No description provided for @authResetPasswordResentMessage.
+  ///
+  /// In es_MX, this message translates to:
+  /// **'Te enviamos un nuevo código.'**
+  String get authResetPasswordResentMessage;
+
+  /// No description provided for @authResetPasswordCodeInvalidError.
+  ///
+  /// In es_MX, this message translates to:
+  /// **'Código incorrecto. Revísalo e inténtalo de nuevo.'**
+  String get authResetPasswordCodeInvalidError;
+
+  /// No description provided for @authResetPasswordCodeExpiredError.
+  ///
+  /// In es_MX, this message translates to:
+  /// **'El código expiró. Solicita uno nuevo.'**
+  String get authResetPasswordCodeExpiredError;
+
+  /// No description provided for @authResetPasswordTooManyAttemptsError.
+  ///
+  /// In es_MX, this message translates to:
+  /// **'Demasiados intentos. Solicita un código nuevo.'**
+  String get authResetPasswordTooManyAttemptsError;
+
+  /// No description provided for @authResetPasswordWeakPasswordError.
+  ///
+  /// In es_MX, this message translates to:
+  /// **'La contraseña debe tener al menos 6 caracteres.'**
+  String get authResetPasswordWeakPasswordError;
+
+  /// No description provided for @authResetPasswordNoPendingCodeError.
+  ///
+  /// In es_MX, this message translates to:
+  /// **'No hay un código de recuperación pendiente. Solicita uno nuevo.'**
+  String get authResetPasswordNoPendingCodeError;
+
+  /// No description provided for @authResetPasswordNetworkError.
+  ///
+  /// In es_MX, this message translates to:
+  /// **'Sin conexión con el servidor. Verifica tu red.'**
+  String get authResetPasswordNetworkError;
+
+  /// No description provided for @authResetPasswordServerError.
+  ///
+  /// In es_MX, this message translates to:
+  /// **'Error del servidor. Inténtalo más tarde.'**
+  String get authResetPasswordServerError;
+
+  /// No description provided for @authResetPasswordGenericError.
+  ///
+  /// In es_MX, this message translates to:
+  /// **'No se pudo restablecer la contraseña.'**
+  String get authResetPasswordGenericError;
+
+  /// No description provided for @authVerifyOtpTitle.
+  ///
+  /// In es_MX, this message translates to:
+  /// **'Verifica tu correo'**
+  String get authVerifyOtpTitle;
+
+  /// No description provided for @authVerifyOtpSubtitle.
+  ///
+  /// In es_MX, this message translates to:
+  /// **'Escribe el código de 6 dígitos que enviamos a\n{email}'**
+  String authVerifyOtpSubtitle(String email);
+
+  /// No description provided for @authVerifyOtpCodeLengthError.
+  ///
+  /// In es_MX, this message translates to:
+  /// **'El código tiene 6 dígitos'**
+  String get authVerifyOtpCodeLengthError;
+
+  /// No description provided for @authVerifyOtpSubmitButton.
+  ///
+  /// In es_MX, this message translates to:
+  /// **'Verificar'**
+  String get authVerifyOtpSubmitButton;
+
+  /// No description provided for @authVerifyOtpResendCooldown.
+  ///
+  /// In es_MX, this message translates to:
+  /// **'Reenviar código en {seconds} s'**
+  String authVerifyOtpResendCooldown(int seconds);
+
+  /// No description provided for @authVerifyOtpResendButton.
+  ///
+  /// In es_MX, this message translates to:
+  /// **'Reenviar código'**
+  String get authVerifyOtpResendButton;
+
+  /// No description provided for @authVerifyOtpBackButton.
+  ///
+  /// In es_MX, this message translates to:
+  /// **'Volver'**
+  String get authVerifyOtpBackButton;
+
+  /// No description provided for @authVerifyOtpInvalidError.
+  ///
+  /// In es_MX, this message translates to:
+  /// **'Código incorrecto. Revísalo e inténtalo de nuevo.'**
+  String get authVerifyOtpInvalidError;
+
+  /// No description provided for @authVerifyOtpExpiredError.
+  ///
+  /// In es_MX, this message translates to:
+  /// **'El código expiró. Solicita uno nuevo.'**
+  String get authVerifyOtpExpiredError;
+
+  /// No description provided for @authVerifyOtpTooManyAttemptsError.
+  ///
+  /// In es_MX, this message translates to:
+  /// **'Demasiados intentos. Solicita un código nuevo.'**
+  String get authVerifyOtpTooManyAttemptsError;
+
+  /// No description provided for @authVerifyOtpUserNotFoundError.
+  ///
+  /// In es_MX, this message translates to:
+  /// **'No encontramos una cuenta con ese correo.'**
+  String get authVerifyOtpUserNotFoundError;
+
+  /// No description provided for @authVerifyOtpNetworkError.
+  ///
+  /// In es_MX, this message translates to:
+  /// **'Sin conexión con el servidor. Verifica tu red.'**
+  String get authVerifyOtpNetworkError;
+
+  /// No description provided for @authVerifyOtpServerError.
+  ///
+  /// In es_MX, this message translates to:
+  /// **'Error del servidor. Inténtalo más tarde.'**
+  String get authVerifyOtpServerError;
+
+  /// No description provided for @authVerifyOtpGenericError.
+  ///
+  /// In es_MX, this message translates to:
+  /// **'No se pudo verificar el código.'**
+  String get authVerifyOtpGenericError;
+
+  /// No description provided for @authVerifyOtpResentMessage.
+  ///
+  /// In es_MX, this message translates to:
+  /// **'Te enviamos un nuevo código.'**
+  String get authVerifyOtpResentMessage;
+
+  /// No description provided for @reactionLike.
+  ///
+  /// In es_MX, this message translates to:
+  /// **'Me gusta'**
+  String get reactionLike;
+
+  /// No description provided for @reactionLove.
+  ///
+  /// In es_MX, this message translates to:
+  /// **'Me encanta'**
+  String get reactionLove;
+
+  /// No description provided for @reactionHaha.
+  ///
+  /// In es_MX, this message translates to:
+  /// **'Me divierte'**
+  String get reactionHaha;
+
+  /// No description provided for @reactionWow.
+  ///
+  /// In es_MX, this message translates to:
+  /// **'Me sorprende'**
+  String get reactionWow;
+
+  /// No description provided for @reactionFire.
+  ///
+  /// In es_MX, this message translates to:
+  /// **'Increíble'**
+  String get reactionFire;
+
+  /// No description provided for @reactionCreative.
+  ///
+  /// In es_MX, this message translates to:
+  /// **'Creativo'**
+  String get reactionCreative;
+
+  /// No description provided for @backendFeedTimeAgoNow.
+  ///
+  /// In es_MX, this message translates to:
+  /// **'Ahora'**
+  String get backendFeedTimeAgoNow;
+
+  /// No description provided for @backendFeedTimeAgoMinutes.
+  ///
+  /// In es_MX, this message translates to:
+  /// **'Hace {count} min'**
+  String backendFeedTimeAgoMinutes(int count);
+
+  /// No description provided for @backendFeedTimeAgoHours.
+  ///
+  /// In es_MX, this message translates to:
+  /// **'Hace {count} h'**
+  String backendFeedTimeAgoHours(int count);
+
+  /// No description provided for @backendFeedTimeAgoDays.
+  ///
+  /// In es_MX, this message translates to:
+  /// **'Hace {count} d'**
+  String backendFeedTimeAgoDays(int count);
+
+  /// No description provided for @backendFeedDefaultUsername.
+  ///
+  /// In es_MX, this message translates to:
+  /// **'usuario'**
+  String get backendFeedDefaultUsername;
+
+  /// No description provided for @backendFeedPostedInCommunity.
+  ///
+  /// In es_MX, this message translates to:
+  /// **'publicó en {community}'**
+  String backendFeedPostedInCommunity(String community);
+
+  /// No description provided for @backendFeedPostedInCommunityUnknown.
+  ///
+  /// In es_MX, this message translates to:
+  /// **'publicó en una comunidad'**
+  String get backendFeedPostedInCommunityUnknown;
+
+  /// No description provided for @backendFeedDeletePostTitle.
+  ///
+  /// In es_MX, this message translates to:
+  /// **'Eliminar publicación'**
+  String get backendFeedDeletePostTitle;
+
+  /// No description provided for @backendFeedPostDeletedMessage.
+  ///
+  /// In es_MX, this message translates to:
+  /// **'Publicación eliminada'**
+  String get backendFeedPostDeletedMessage;
+
+  /// No description provided for @backendFeedCommentHint.
+  ///
+  /// In es_MX, this message translates to:
+  /// **'Escribe un comentario…'**
+  String get backendFeedCommentHint;
+
+  /// No description provided for @backendFeedNoCommentsYet.
+  ///
+  /// In es_MX, this message translates to:
+  /// **'Sé el primero en comentar'**
+  String get backendFeedNoCommentsYet;
+
+  /// No description provided for @subscriptionComingSoon.
+  ///
+  /// In es_MX, this message translates to:
+  /// **'Próximamente'**
+  String get subscriptionComingSoon;
+
+  /// No description provided for @walletScreenTitle.
+  ///
+  /// In es_MX, this message translates to:
+  /// **'Zentry Coins'**
+  String get walletScreenTitle;
+
+  /// No description provided for @walletBalanceLabel.
+  ///
+  /// In es_MX, this message translates to:
+  /// **'Saldo disponible'**
+  String get walletBalanceLabel;
+
+  /// No description provided for @walletTransferButton.
+  ///
+  /// In es_MX, this message translates to:
+  /// **'Transferir'**
+  String get walletTransferButton;
+
+  /// No description provided for @walletTransactionsTitle.
+  ///
+  /// In es_MX, this message translates to:
+  /// **'Movimientos'**
+  String get walletTransactionsTitle;
+
+  /// No description provided for @walletEmptyTransactions.
+  ///
+  /// In es_MX, this message translates to:
+  /// **'Aún no tienes movimientos'**
+  String get walletEmptyTransactions;
+
+  /// No description provided for @walletErrorGeneric.
+  ///
+  /// In es_MX, this message translates to:
+  /// **'No se pudo cargar tu billetera'**
+  String get walletErrorGeneric;
+
+  /// No description provided for @walletTransferDialogTitle.
+  ///
+  /// In es_MX, this message translates to:
+  /// **'Transferir Zentry Coins'**
+  String get walletTransferDialogTitle;
+
+  /// No description provided for @walletTransferRecipientHint.
+  ///
+  /// In es_MX, this message translates to:
+  /// **'Usuario destino'**
+  String get walletTransferRecipientHint;
+
+  /// No description provided for @walletTransferAmountHint.
+  ///
+  /// In es_MX, this message translates to:
+  /// **'Cantidad de ZC'**
+  String get walletTransferAmountHint;
+
+  /// No description provided for @walletTransferSubmitButton.
+  ///
+  /// In es_MX, this message translates to:
+  /// **'Enviar'**
+  String get walletTransferSubmitButton;
+
+  /// No description provided for @walletTransferSuccessMessage.
+  ///
+  /// In es_MX, this message translates to:
+  /// **'Transferencia realizada'**
+  String get walletTransferSuccessMessage;
+
+  /// No description provided for @walletTransferAmountInvalid.
+  ///
+  /// In es_MX, this message translates to:
+  /// **'Ingresa una cantidad válida mayor a 0'**
+  String get walletTransferAmountInvalid;
+
+  /// No description provided for @walletTransferRecipientRequired.
+  ///
+  /// In es_MX, this message translates to:
+  /// **'Ingresa el usuario destino'**
+  String get walletTransferRecipientRequired;
+
+  /// No description provided for @walletMenuItem.
+  ///
+  /// In es_MX, this message translates to:
+  /// **'Zentry Coins: {balance}'**
+  String walletMenuItem(String balance);
+
+  /// No description provided for @walletTxIngreso.
+  ///
+  /// In es_MX, this message translates to:
+  /// **'Ingreso'**
+  String get walletTxIngreso;
+
+  /// No description provided for @walletTxEgreso.
+  ///
+  /// In es_MX, this message translates to:
+  /// **'Egreso'**
+  String get walletTxEgreso;
+
+  /// No description provided for @walletTxRecarga.
+  ///
+  /// In es_MX, this message translates to:
+  /// **'Recarga'**
+  String get walletTxRecarga;
+
+  /// No description provided for @communityDetailCreatedByLabel.
+  ///
+  /// In es_MX, this message translates to:
+  /// **'Creado por @{username}'**
+  String communityDetailCreatedByLabel(String username);
+
+  /// No description provided for @communityDetailNoPosts.
+  ///
+  /// In es_MX, this message translates to:
+  /// **'Aún no hay publicaciones en esta comunidad'**
+  String get communityDetailNoPosts;
+
+  /// No description provided for @communityDetailNewPostButton.
+  ///
+  /// In es_MX, this message translates to:
+  /// **'Nueva publicación'**
+  String get communityDetailNewPostButton;
+
+  /// No description provided for @communityDetailNewPostHint.
+  ///
+  /// In es_MX, this message translates to:
+  /// **'¿Qué quieres compartir?'**
+  String get communityDetailNewPostHint;
+
+  /// No description provided for @communityDetailNewPostTitleRequired.
+  ///
+  /// In es_MX, this message translates to:
+  /// **'Escribe un título'**
+  String get communityDetailNewPostTitleRequired;
+
+  /// No description provided for @communityDetailPostPublishedSnackbar.
+  ///
+  /// In es_MX, this message translates to:
+  /// **'Publicación creada'**
+  String get communityDetailPostPublishedSnackbar;
+
+  /// No description provided for @communityDetailErrorGeneric.
+  ///
+  /// In es_MX, this message translates to:
+  /// **'No se pudo cargar la comunidad'**
+  String get communityDetailErrorGeneric;
+
+  /// No description provided for @communityDetailNotFound.
+  ///
+  /// In es_MX, this message translates to:
+  /// **'Esta comunidad ya no existe'**
+  String get communityDetailNotFound;
+
+  /// No description provided for @communityDetailAddImageButton.
+  ///
+  /// In es_MX, this message translates to:
+  /// **'Agregar imagen'**
+  String get communityDetailAddImageButton;
 }
 
 class _AppLocalizationsDelegate

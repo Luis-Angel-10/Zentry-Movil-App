@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:Zentry/core/providers/auth_controller.dart';
 import 'package:Zentry/core/services/auth_repository.dart';
+import 'package:Zentry/features/auth/forgot_password_page.dart';
 import 'package:Zentry/features/auth/verify_otp_page.dart';
 import 'package:Zentry/l10n/generated/app_localizations.dart';
 import 'package:Zentry/theme/theme_controller.dart';
@@ -126,6 +127,20 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
     }
   }
 
+  Future<void> _forgotPassword() async {
+    final auth = context.read<AuthController>();
+    if (auth.isLoading) return;
+
+    final resetDone = await Navigator.of(
+      context,
+    ).push<bool>(MaterialPageRoute(builder: (_) => const ForgotPasswordPage()));
+
+    if (!mounted || resetDone != true) return;
+    _showSuccess(
+      AppLocalizations.of(context)!.authForgotPasswordSuccessMessage,
+    );
+  }
+
   void _showError(String message) {
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
@@ -227,7 +242,14 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
 
         FadeTransition(
           opacity: _fadeAnimation,
-          child: Image.asset("assets/inicio.png", height: 200),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(28),
+            child: Image.asset(
+              "assets/Logo-Zentry.jpg",
+              height: 140,
+              fit: BoxFit.contain,
+            ),
+          ),
         ),
 
         const SizedBox(height: 16),
@@ -347,7 +369,14 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
 
         FadeTransition(
           opacity: _fadeAnimation,
-          child: Image.asset("assets/inicio.png", height: 220),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(32),
+            child: Image.asset(
+              "assets/Logo-Zentry.jpg",
+              height: 160,
+              fit: BoxFit.contain,
+            ),
+          ),
         ),
 
         const SizedBox(height: 10),
@@ -425,7 +454,20 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
           ),
         ),
 
-        const SizedBox(height: 26),
+        const SizedBox(height: 8),
+
+        Align(
+          alignment: Alignment.centerRight,
+          child: TextButton(
+            onPressed: isLoading ? null : _forgotPassword,
+            child: const Text(
+              '¿Olvidaste tu contraseña?',
+              style: TextStyle(color: Colors.white70, fontSize: 13),
+            ),
+          ),
+        ),
+
+        const SizedBox(height: 10),
 
         SizedBox(
           width: double.infinity,

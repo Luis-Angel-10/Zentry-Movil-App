@@ -47,5 +47,17 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<!-- FCM (Fase 3/16): permite recibir push en background. NO alcanza por
+	     sí solo: en Xcode hay que activar la capability "Push Notifications"
+	     (genera el entitlement APNs) y, en el Apple Developer Portal, un
+	     certificado/key APNs asociado al App ID y subido al proyecto
+	     Firebase. Sin GoogleService-Info.plist real, FcmService.init() falla
+	     de forma controlada y no afecta al resto de la app. -->
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>remote-notification</string>
+	</array>
+	<key>FirebaseAppDelegateProxyEnabled</key>
+	<true/>
 </dict>
 </plist>

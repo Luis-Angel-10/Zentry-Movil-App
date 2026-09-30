@@ -49,7 +49,7 @@ class _EventsScreenState extends State<EventsScreen>
 
       "status": "Disponible",
 
-      "cover": "assets/inicio.png",
+      "cover": null,
 
       "joined": false,
 
@@ -71,7 +71,7 @@ class _EventsScreenState extends State<EventsScreen>
 
       "status": "Pocos lugares",
 
-      "cover": "assets/login.png",
+      "cover": null,
 
       "joined": false,
 
@@ -93,7 +93,7 @@ class _EventsScreenState extends State<EventsScreen>
 
       "status": "Disponible",
 
-      "cover": "assets/inicio.png",
+      "cover": null,
 
       "joined": true,
 
@@ -115,7 +115,7 @@ class _EventsScreenState extends State<EventsScreen>
 
       "status": "Completo",
 
-      "cover": "assets/login.png",
+      "cover": null,
 
       "joined": false,
 
@@ -137,7 +137,7 @@ class _EventsScreenState extends State<EventsScreen>
 
       "status": "Disponible",
 
-      "cover": "assets/inicio.png",
+      "cover": null,
 
       "joined": false,
 
@@ -534,11 +534,35 @@ class _EventsScreenState extends State<EventsScreen>
                                         child: Stack(
                                           children: [
                                             Positioned.fill(
-                                              child: Image.asset(
-                                                event["cover"],
-
-                                                fit: BoxFit.cover,
-                                              ),
+                                              child: event["cover"] != null
+                                                  ? Image.asset(
+                                                      event["cover"] as String,
+                                                      fit: BoxFit.cover,
+                                                    )
+                                                  : Container(
+                                                      decoration: BoxDecoration(
+                                                        gradient:
+                                                            LinearGradient(
+                                                              colors: [
+                                                                Colors
+                                                                    .deepPurple
+                                                                    .shade900,
+                                                                Colors.black87,
+                                                              ],
+                                                              begin: Alignment
+                                                                  .topLeft,
+                                                              end: Alignment
+                                                                  .bottomRight,
+                                                            ),
+                                                      ),
+                                                      child: const Center(
+                                                        child: Icon(
+                                                          Icons.event_outlined,
+                                                          color: Colors.white24,
+                                                          size: 48,
+                                                        ),
+                                                      ),
+                                                    ),
                                             ),
 
                                             if (event["featured"])

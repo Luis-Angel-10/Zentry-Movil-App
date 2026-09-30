@@ -7,10 +7,10 @@ import 'package:Zentry/features/achievements/achievements_screen.dart';
 import 'package:Zentry/features/stories/story_viewer_screen.dart';
 import 'package:Zentry/theme/theme_controller.dart';
 import 'package:Zentry/core/providers/auth_controller.dart';
-import 'package:Zentry/core/providers/engagement_controller.dart';
-import 'package:Zentry/core/providers/follow_controller.dart';
 import 'package:Zentry/core/providers/notifications_controller.dart';
 import 'package:Zentry/core/providers/posts_controller.dart';
+import 'package:Zentry/core/providers/streak_controller.dart';
+import 'package:Zentry/core/widgets/zentry_network_image.dart';
 import 'package:Zentry/features/notifications/notifications_screen.dart';
 import 'package:Zentry/features/search/global_search_screen.dart';
 import 'package:Zentry/l10n/generated/app_localizations.dart';
@@ -36,7 +36,21 @@ class _HomeScreenState extends State<HomeScreen> {
       if (!controller.feedLoaded && !controller.feedLoading) {
         controller.refreshFeed();
       }
+      if (!controller.storiesLoaded && !controller.storiesLoading) {
+        controller.loadBackendStories();
+      }
     });
+  }
+
+  /// Pull-to-refresh coordinado: feed + historias + racha, en paralelo (no
+  /// secuencial, para no hacer esperar más de lo necesario), sin tocar
+  /// WebSocket ni ningún otro caché.
+  Future<void> _refreshHome(BuildContext context) async {
+    await Future.wait([
+      context.read<PostsController>().refreshFeed(),
+      context.read<PostsController>().loadBackendStories(),
+      context.read<StreakController>().load(),
+    ]);
   }
 
   @override
@@ -59,22 +73,29 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     final accentColor = context.watch<ThemeController>().accentColor;
     final l10n = AppLocalizations.of(context)!;
-    final engagement = context.watch<EngagementController>();
+    final streak = context.watch<StreakController>();
     final postsController = context.watch<PostsController>();
-    final follow = context.watch<FollowController>();
     final myName = context.watch<AuthController>().currentUser?.displayName;
-    final storyGroups = postsController.groupedVisibleStories(
-      viewerName: myName ?? '',
-      isFollowing: (authorId) {
-        final me = context.read<AuthController>().currentUser;
-        return me != null && follow.isFollowing(me.id, authorId);
-      },
+    final storyGroups = postsController.backendGroupedStories(
+      viewerDisplayName: myName ?? '',
     );
+    // Estados explícitos de la fila de historias (corrección Fase 3B):
+    // mientras `loadBackendStories()` todavía no ha resuelto NUNCA su
+    // primera respuesta se considera "cargando"; si falló y no hay ninguna
+    // historia real que mostrar, se ofrece un tile de reintento en vez de
+    // fallar en silencio o dejar la fila vacía sin explicación.
+    final storiesFirstLoad =
+        postsController.storiesLoading && !postsController.storiesLoaded;
+    final storiesShowRetry =
+        !storiesFirstLoad &&
+        postsController.storiesError != null &&
+        storyGroups.isEmpty;
+    final storiesExtraTile = storiesFirstLoad || storiesShowRetry;
 
     return Scaffold(
       body: SafeArea(
         child: RefreshIndicator(
-          onRefresh: () => context.read<PostsController>().refreshFeed(),
+          onRefresh: () => _refreshHome(context),
           child: CustomScrollView(
             controller: _scrollController,
             physics: const AlwaysScrollableScrollPhysics(
@@ -106,41 +127,54 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ),
                               );
                             },
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 10,
-                                vertical: 6,
-                              ),
-                              decoration: BoxDecoration(
-                                color: engagement.isStreakActiveToday
-                                    ? Colors.deepOrange.withOpacity(0.15)
-                                    : Colors.white10,
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              child: Row(
-                                children: [
-                                  Icon(
-                                    Icons.local_fire_department,
-                                    color: engagement.isStreakActiveToday
-                                        ? Colors.deepOrange
-                                        : Colors.white38,
-                                    size: 18,
+                            child: Builder(
+                              builder: (context) {
+                                // 3 colores reales (corrección): activa hoy
+                                // (naranja lleno), vigente-pero-pendiente
+                                // (ámbar tenue, para no confundirla con
+                                // "perdida"), nunca-empezada/perdida (gris).
+                                final status = streak.status;
+                                final Color color = switch (status) {
+                                  StreakStatus.activeToday => Colors.deepOrange,
+                                  StreakStatus.pendingToday => Colors.amber,
+                                  StreakStatus.neverStarted ||
+                                  StreakStatus.lost => Colors.white38,
+                                };
+                                return Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                    vertical: 6,
                                   ),
-                                  const SizedBox(width: 4),
-                                  Text(
-                                    l10n.homeStreakChipLabel(
-                                      engagement.streakCount,
-                                    ),
-                                    style: TextStyle(
-                                      color: engagement.isStreakActiveToday
-                                          ? Colors.deepOrange
-                                          : Colors.white38,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 13,
-                                    ),
+                                  decoration: BoxDecoration(
+                                    color:
+                                        status == StreakStatus.neverStarted ||
+                                            status == StreakStatus.lost
+                                        ? Colors.white10
+                                        : color.withValues(alpha: 0.15),
+                                    borderRadius: BorderRadius.circular(20),
                                   ),
-                                ],
-                              ),
+                                  child: Row(
+                                    children: [
+                                      Icon(
+                                        Icons.local_fire_department,
+                                        color: color,
+                                        size: 18,
+                                      ),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        l10n.homeStreakChipLabel(
+                                          streak.currentStreak,
+                                        ),
+                                        style: TextStyle(
+                                          color: color,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 13,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
                             ),
                           ),
                           IconButton(
@@ -217,14 +251,15 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
 
-              // Historias (aún locales; no integradas en Fase 2).
+              // Historias reales del backend (`GET /api/core/stories/feed`).
               SliverToBoxAdapter(
                 child: SizedBox(
                   height: 110,
                   child: ListView.builder(
                     scrollDirection: Axis.horizontal,
                     padding: const EdgeInsets.symmetric(horizontal: 14),
-                    itemCount: storyGroups.length + 1,
+                    itemCount:
+                        storyGroups.length + 1 + (storiesExtraTile ? 1 : 0),
                     itemBuilder: (_, index) {
                       if (index == 0) {
                         return GestureDetector(
@@ -275,9 +310,25 @@ class _HomeScreenState extends State<HomeScreen> {
                         );
                       }
 
-                      final group = storyGroups[index - 1];
-                      final File? storyImage =
+                      if (storiesExtraTile && index == 1) {
+                        return _StoriesStatusTile(
+                          loading: storiesFirstLoad,
+                          onRetry: storiesShowRetry
+                              ? () => postsController.loadBackendStories()
+                              : null,
+                        );
+                      }
+
+                      final group =
+                          storyGroups[index - 1 - (storiesExtraTile ? 1 : 0)];
+                      final File? storyImageFile =
                           group.latest["imageFile"] as File?;
+                      final String? storyMediaUrl =
+                          group.latest["mediaIsVideo"] == true
+                          ? null
+                          : group.latest["mediaUrl"] as String?;
+                      final String? storyAvatarUrl =
+                          group.latest["avatarUrl"] as String?;
                       final seen = group.allSeenBy(myName ?? '');
 
                       return GestureDetector(
@@ -318,18 +369,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                         )
                                       : null,
                                 ),
-                                child: CircleAvatar(
+                                child: ZentryAvatar(
                                   radius: 30,
-                                  backgroundColor: Colors.white10,
-                                  backgroundImage: storyImage != null
-                                      ? FileImage(storyImage) as ImageProvider
-                                      : null,
-                                  child: storyImage == null
-                                      ? const Icon(
-                                          Icons.person,
-                                          color: Colors.white,
-                                        )
-                                      : null,
+                                  localFilePath: storyImageFile?.path,
+                                  networkUrl: storyMediaUrl ?? storyAvatarUrl,
                                 ),
                               ),
                               const SizedBox(height: 6),
@@ -450,7 +493,22 @@ class _HomeScreenState extends State<HomeScreen> {
     return [
       SliverList(
         delegate: SliverChildBuilderDelegate(
-          (_, index) => BackendPostCard(post: c.backendPosts[index]),
+          // `Center`+`ConstrainedBox` (no cambia el ancho del scroll/gesto
+          // de pull-to-refresh, que sigue ocupando toda la pantalla): en
+          // tablets, sin este límite, la tarjeta —y con ella imágenes y
+          // videos— se estira al ancho completo de la pantalla, agrandando
+          // muchísimo la altura de cualquier media vertical. 680 deja una
+          // sola columna cómoda en tablets sin achicar nada en teléfono
+          // (donde el ancho disponible casi siempre es menor que eso).
+          (_, index) => Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 680),
+              child: BackendPostCard(
+                key: ValueKey('backend_post_${c.backendPosts[index].id}'),
+                post: c.backendPosts[index],
+              ),
+            ),
+          ),
           childCount: c.backendPosts.length,
         ),
       ),
@@ -477,69 +535,6 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
     ];
-  }
-}
-
-class AnimatedLikeButton extends StatefulWidget {
-  final int likes;
-  final bool initialLiked;
-  final VoidCallback? onLiked;
-  final ValueChanged<bool>? onToggle;
-
-  const AnimatedLikeButton({
-    super.key,
-    required this.likes,
-    this.initialLiked = false,
-    this.onLiked,
-    this.onToggle,
-  });
-
-  @override
-  State<AnimatedLikeButton> createState() => _AnimatedLikeButtonState();
-}
-
-class _AnimatedLikeButtonState extends State<AnimatedLikeButton> {
-  late bool liked = widget.initialLiked;
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        final wasLiked = liked;
-        setState(() {
-          liked = !liked;
-        });
-        widget.onToggle?.call(liked);
-        if (!wasLiked) {
-          widget.onLiked?.call();
-        }
-      },
-      child: AnimatedScale(
-        scale: liked ? 1.2 : 1,
-        duration: const Duration(milliseconds: 180),
-        child: Row(
-          children: [
-            AnimatedSwitcher(
-              duration: const Duration(milliseconds: 250),
-              transitionBuilder: (child, animation) {
-                return ScaleTransition(scale: animation, child: child);
-              },
-              child: Icon(
-                liked ? Icons.favorite : Icons.favorite_border,
-                key: ValueKey(liked),
-                color: liked ? Colors.pinkAccent : Colors.white70,
-                size: 22,
-              ),
-            ),
-            const SizedBox(width: 6),
-            Text(
-              "${widget.likes}",
-              style: const TextStyle(color: Colors.white70),
-            ),
-          ],
-        ),
-      ),
-    );
   }
 }
 
@@ -618,6 +613,61 @@ class _AnimatedActionButtonState extends State<AnimatedActionButton> {
                 style: const TextStyle(color: Colors.white70, fontSize: 13),
               ),
             ],
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Tile de la fila de historias para los estados explícitos de carga/error
+/// (corrección Fase 3B) — evita que, mientras `loadBackendStories()` está en
+/// vuelo o falló, la fila simplemente no diga nada o (peor) intente acceder
+/// a datos que todavía no existen. No reemplaza "Tu historia" ni las
+/// historias reales: sólo aparece como un tile adicional mientras ninguna
+/// historia real está disponible todavía.
+class _StoriesStatusTile extends StatelessWidget {
+  const _StoriesStatusTile({required this.loading, this.onRetry});
+
+  final bool loading;
+  final VoidCallback? onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return GestureDetector(
+      onTap: onRetry,
+      child: Container(
+        width: 78,
+        margin: const EdgeInsets.only(right: 12),
+        child: Column(
+          children: [
+            Container(
+              width: 60,
+              height: 60,
+              decoration: const BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white10,
+              ),
+              alignment: Alignment.center,
+              child: loading
+                  ? const SizedBox(
+                      width: 22,
+                      height: 22,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white54,
+                      ),
+                    )
+                  : const Icon(Icons.refresh, color: Colors.white54, size: 24),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              loading ? l10n.homeStoriesLoading : l10n.homeStoriesRetry,
+              style: const TextStyle(color: Colors.white54, fontSize: 11),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
           ],
         ),
       ),

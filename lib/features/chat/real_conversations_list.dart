@@ -195,8 +195,7 @@ class _RealConversationsListState extends State<RealConversationsList> {
         : null;
     final unread = c.unreadCount > 0;
     final myId = context.read<AuthController>().currentUser?.id;
-    final lastFromMe =
-        myId != null && c.lastMessageSenderId != null
+    final lastFromMe = myId != null && c.lastMessageSenderId != null
         ? c.lastMessageSenderId == myId
         : false;
 

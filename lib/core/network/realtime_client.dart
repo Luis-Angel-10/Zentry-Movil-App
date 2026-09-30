@@ -136,8 +136,9 @@ class RealtimeClient {
     if (conversationId == activeConversationId) return;
 
     try {
-      final profile = _senderProfileCache[message.senderId] ??=
-          await ProfileApi.instance.getProfileByUserId(message.senderId);
+      final profile = _senderProfileCache[message.senderId] ??= await ProfileApi
+          .instance
+          .getProfileByUserId(message.senderId);
       final senderName = (profile.name?.isNotEmpty ?? false)
           ? profile.name!
           : (profile.username.isNotEmpty
@@ -148,6 +149,7 @@ class RealtimeClient {
         senderName: senderName,
         body: _bodyFor(message),
         payload: jsonEncode({
+          'type': 'message',
           'conversationId': conversationId,
           'otherUserId': message.senderId,
           'otherUsername': profile.username,
@@ -164,6 +166,7 @@ class RealtimeClient {
         senderName: 'Nuevo mensaje',
         body: _bodyFor(message),
         payload: jsonEncode({
+          'type': 'message',
           'conversationId': conversationId,
           'otherUserId': message.senderId,
         }),
@@ -180,7 +183,8 @@ class RealtimeClient {
     if (type.startsWith('image') || type.startsWith('img')) return '📷 Imagen';
     if (type.startsWith('video')) return '🎥 Video';
     if (type.startsWith('audio')) return '🎵 Audio';
-    if (type.startsWith('file') || type.startsWith('doc')) return '📎 Documento';
+    if (type.startsWith('file') || type.startsWith('doc'))
+      return '📎 Documento';
     final content = message.content?.trim() ?? '';
     return content.isEmpty ? 'Nuevo mensaje' : content;
   }

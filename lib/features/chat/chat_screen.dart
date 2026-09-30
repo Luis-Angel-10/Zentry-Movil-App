@@ -12,8 +12,8 @@ import 'package:record/record.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 
 import 'package:Zentry/core/providers/auth_controller.dart';
-import 'package:Zentry/core/providers/follow_controller.dart';
 import 'package:Zentry/core/providers/posts_controller.dart';
+import 'package:Zentry/core/widgets/zentry_network_image.dart';
 import 'package:Zentry/features/create/create_screen.dart';
 import 'package:Zentry/features/create/media_editor/audio_trim_screen.dart';
 import 'package:Zentry/features/stories/story_viewer_screen.dart';
@@ -130,13 +130,8 @@ class _ChatScreenState extends State<ChatScreen>
 
   List<StoryGroup> _groupedStories(BuildContext context) {
     final posts = context.watch<PostsController>();
-    final follow = context.watch<FollowController>();
     final me = context.watch<AuthController>().currentUser;
-    return posts.groupedVisibleStories(
-      viewerName: me?.displayName ?? '',
-      isFollowing: (authorId) =>
-          me != null && follow.isFollowing(me.id, authorId),
-    );
+    return posts.backendGroupedStories(viewerDisplayName: me?.displayName ?? '');
   }
 
   void openChat(String name) {
@@ -909,7 +904,11 @@ class _ChatScreenState extends State<ChatScreen>
     required String myName,
   }) {
     final latest = group.latest;
-    final File? storyImage = latest["imageFile"] as File?;
+    final File? storyImageFile = latest["imageFile"] as File?;
+    final String? storyMediaUrl = latest["mediaIsVideo"] == true
+        ? null
+        : latest["mediaUrl"] as String?;
+    final String? storyAvatarUrl = latest["avatarUrl"] as String?;
 
     return ListTile(
       leading: Container(
@@ -923,15 +922,11 @@ class _ChatScreenState extends State<ChatScreen>
                 ),
           border: seen ? Border.all(color: Colors.white24, width: 2.5) : null,
         ),
-        child: CircleAvatar(
+        child: ZentryAvatar(
           radius: 26,
           backgroundColor: const Color(0xFF1E1E2D),
-          backgroundImage: storyImage != null
-              ? FileImage(storyImage) as ImageProvider
-              : null,
-          child: storyImage == null
-              ? const Icon(Icons.person, color: Colors.white)
-              : null,
+          localFilePath: storyImageFile?.path,
+          networkUrl: storyMediaUrl ?? storyAvatarUrl,
         ),
       ),
 

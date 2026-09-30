@@ -92,7 +92,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (_) => CommunityDetailScreen(communityId: communityId),
+            builder: (_) => CommunityDetailScreen(identifier: communityId),
           ),
         );
         break;

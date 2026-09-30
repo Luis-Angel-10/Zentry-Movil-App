@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import 'package:Zentry/core/models/achievement.dart';
 import 'package:Zentry/core/providers/engagement_controller.dart';
+import 'package:Zentry/core/providers/streak_controller.dart';
 import 'package:Zentry/features/achievements/ranks_screen.dart';
 import 'package:Zentry/features/achievements/streak_screen.dart';
 import 'package:Zentry/features/challenges/challenges_screen.dart';
@@ -180,12 +181,44 @@ class _AchievementsScreenState extends State<AchievementsScreen>
     }
   }
 
-  int _valueFor(EngagementController engagement, AchievementMetric metric) {
+  /// Corrección racha: los logros de tipo `streak` (streak_3/7/30) ya NO se
+  /// evalúan contra `EngagementController.streakCount` (contador local en
+  /// SharedPreferences, que sólo avanza cuando se llama a `registerLike`/
+  /// `registerComment`/`registerPost` y compara fechas con la hora LOCAL del
+  /// dispositivo) sino contra la racha REAL del backend
+  /// (`StreakController`, `GET /api/core/streaks/me`), que es la misma que
+  /// se muestra en la tarjeta de racha de esta pantalla. Antes ambas fuentes
+  /// podían divergir (p. ej. seguir a alguien o unirse a una comunidad cuenta
+  /// como actividad para el backend pero no para el contador local) y el
+  /// usuario veía "🔥 12 días" arriba mientras el logro "Racha de 7 días"
+  /// seguía bloqueado o con progreso equivocado debajo — el reporte de
+  /// "bugeado" de la racha.
+  ///
+  /// Se usa `longestStreak` (récord histórico, monótono) para decidir si el
+  /// logro está desbloqueado — igual que `likesGiven`/`postsPublished`, que
+  /// tampoco bajan nunca — y `currentStreak` (racha vigente) para la barra
+  /// de progreso hacia el siguiente umbral mientras sigue bloqueado.
+  bool _isUnlocked(
+    AchievementDef def,
+    EngagementController engagement,
+    StreakController streak,
+  ) {
+    if (def.metric == AchievementMetric.streak) {
+      return streak.longestStreak >= def.threshold;
+    }
+    return engagement.unlockedAchievements.contains(def.id);
+  }
+
+  int _valueFor(
+    EngagementController engagement,
+    StreakController streak,
+    AchievementMetric metric,
+  ) {
     switch (metric) {
       case AchievementMetric.likes:
         return engagement.likesGiven;
       case AchievementMetric.streak:
-        return engagement.streakCount;
+        return streak.currentStreak;
       case AchievementMetric.posts:
         return engagement.postsPublished;
       case AchievementMetric.comments:
@@ -235,19 +268,25 @@ class _AchievementsScreenState extends State<AchievementsScreen>
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final engagement = context.watch<EngagementController>();
+    final streak = context.watch<StreakController>();
 
     final unlockedDefs = kAchievementDefs.where(
-      (def) => engagement.unlockedAchievements.contains(def.id),
+      (def) => _isUnlocked(def, engagement, streak),
     );
-    final points =
-        unlockedDefs.fold<int>(0, (sum, def) => sum + def.points) +
-        engagement.streakPoints;
-    final unlockedCount = engagement.unlockedAchievements.length;
+    // Corrección racha: ya no se suma `engagement.streakPoints` (bolsa local
+    // de puntos acumulados, desconectada de la racha real del backend y con
+    // su propia regla de fechas en hora local) — los puntos de racha ahora
+    // sólo cuentan cuando el logro streak_3/7/30 realmente se desbloquea con
+    // el récord real (ver `_isUnlocked`), igual que cualquier otro logro.
+    final points = unlockedDefs.fold<int>(0, (sum, def) => sum + def.points);
+    final unlockedCount = kAchievementDefs
+        .where((def) => _isUnlocked(def, engagement, streak))
+        .length;
     final totalCount = kAchievementDefs.length;
     final overallProgress = totalCount == 0 ? 0.0 : unlockedCount / totalCount;
 
     final filtered = kAchievementDefs.where((def) {
-      final isUnlocked = engagement.unlockedAchievements.contains(def.id);
+      final isUnlocked = _isUnlocked(def, engagement, streak);
       switch (_filter) {
         case _AchievementFilter.all:
           return true;
@@ -273,10 +312,10 @@ class _AchievementsScreenState extends State<AchievementsScreen>
           title: _titleFor(l10n, def.id),
           desc: _descFor(l10n, def.id),
           rarity: _rarityFor(l10n, def.id),
-          unlocked: engagement.unlockedAchievements.contains(def.id),
-          progressValue: _valueFor(engagement, def.metric),
+          unlocked: _isUnlocked(def, engagement, streak),
+          progressValue: _valueFor(engagement, streak, def.metric),
           threshold: def.threshold,
-          progress: _valueFor(engagement, def.metric) / def.threshold,
+          progress: _valueFor(engagement, streak, def.metric) / def.threshold,
           color: def.color,
           icon: def.icon,
         ),
@@ -308,7 +347,7 @@ class _AchievementsScreenState extends State<AchievementsScreen>
 
             const SizedBox(height: 20),
 
-            _streakCard(context, l10n, engagement),
+            _streakCard(context, l10n, engagement, streak),
 
             const SizedBox(height: 20),
 
@@ -680,6 +719,7 @@ class _AchievementsScreenState extends State<AchievementsScreen>
     BuildContext context,
     AppLocalizations l10n,
     EngagementController engagement,
+    StreakController streak,
   ) {
     return FadeTransition(
       opacity: _streakFade,
@@ -728,7 +768,7 @@ class _AchievementsScreenState extends State<AchievementsScreen>
                         const SizedBox(height: 2),
                         Text(
                           l10n.achievementsStreakDaysLabel(
-                            engagement.streakCount,
+                            streak.currentStreak,
                           ),
                           style: const TextStyle(
                             color: Colors.white,
@@ -743,16 +783,6 @@ class _AchievementsScreenState extends State<AchievementsScreen>
                             fontSize: 12,
                           ),
                         ),
-                        const SizedBox(height: 6),
-                        Text(
-                          l10n.achievementsStreakPointsTotalLabel(
-                            engagement.streakPoints,
-                          ),
-                          style: const TextStyle(
-                            color: Colors.white70,
-                            fontSize: 12,
-                          ),
-                        ),
                       ],
                     ),
                   ),
@@ -760,7 +790,7 @@ class _AchievementsScreenState extends State<AchievementsScreen>
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       Text(
-                        l10n.achievementsStreakBestLabel(engagement.bestStreak),
+                        l10n.achievementsStreakBestLabel(streak.longestStreak),
                         style: const TextStyle(
                           color: Colors.white70,
                           fontSize: 12,
@@ -778,7 +808,7 @@ class _AchievementsScreenState extends State<AchievementsScreen>
                         ),
                         child: Text(
                           l10n.achievementsStreakRewardLabel(
-                            engagement.todayStreakReward,
+                            streak.todayReward,
                           ),
                           style: const TextStyle(
                             color: Colors.white,

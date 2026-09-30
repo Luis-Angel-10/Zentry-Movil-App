@@ -12,13 +12,14 @@ import 'package:Zentry/core/models/portfolio_item.dart';
 import 'package:Zentry/core/providers/auth_controller.dart';
 import 'package:Zentry/core/providers/community_controller.dart';
 import 'package:Zentry/core/providers/engagement_controller.dart';
-import 'package:Zentry/core/providers/follow_controller.dart';
 import 'package:Zentry/core/providers/portfolio_controller.dart';
 import 'package:Zentry/core/providers/posts_controller.dart';
 import 'package:Zentry/core/providers/virtual_pet_controller.dart';
+import 'package:Zentry/core/widgets/zentry_network_image.dart';
 import 'package:Zentry/features/communities/community_detail_screen.dart';
 import 'package:Zentry/features/profile/add_portfolio_item_screen.dart';
 import 'package:Zentry/features/profile/edit_profile_screen.dart';
+import 'package:Zentry/features/profile/profile_avatar_story_ring.dart';
 import 'package:Zentry/features/profile/pet_detail_screen.dart';
 import 'package:Zentry/features/profile/qr_code_screen.dart';
 import 'package:Zentry/features/stories/story_viewer_screen.dart';
@@ -210,7 +211,6 @@ class _ProfileScreenState extends State<ProfileScreen>
     final auth = context.watch<AuthController>();
     final currentUser = auth.currentUser;
     final backendProfile = auth.backendProfile;
-    final follow = context.watch<FollowController>();
     final postsController = context.watch<PostsController>();
 
     // Pestaña "Publicaciones": feed real del backend (mis publicaciones).
@@ -250,12 +250,13 @@ class _ProfileScreenState extends State<ProfileScreen>
               ? NetworkImage(backendProfile!.avatarUrlAbsolute!)
               : null);
 
-    final followersCount =
-        backendProfile?.followersCount ??
-        (currentUser != null ? follow.followersCount(currentUser.id) : 0);
-    final followingCount =
-        backendProfile?.followingCount ??
-        (currentUser != null ? follow.followingCount(currentUser.id) : 0);
+    // El backend es la única fuente de verdad de follow (antes había un
+    // fallback a FollowController local que mezclaba un grafo social
+    // completamente distinto —el de las historias mock— con el conteo real).
+    // Si el perfil real todavía no cargó (arranque en frío / sin red), se
+    // muestra 0 en vez de un número local que no significa lo mismo.
+    final followersCount = backendProfile?.followersCount ?? 0;
+    final followingCount = backendProfile?.followingCount ?? 0;
 
     final highlights = currentUser != null
         ? context.watch<PostsController>().highlightedStoriesOf(
@@ -319,40 +320,46 @@ class _ProfileScreenState extends State<ProfileScreen>
                       Positioned(
                         left: 18,
                         bottom: -38,
-                        child: GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => const EditProfileScreen(),
-                              ),
-                            );
-                          },
-                          child: Container(
-                            padding: const EdgeInsets.all(3),
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Theme.of(context).scaffoldBackgroundColor,
-                              gradient: LinearGradient(
-                                colors: avatarFrameColors(
-                                  currentUser?.avatarFrameId,
+                        child: currentUser == null
+                            ? const SizedBox.shrink()
+                            : ProfileAvatarStoryRing(
+                                userId: currentUser.id,
+                                displayName: currentUser.displayName,
+                                username: currentUser.username,
+                                avatarUrl: backendProfile?.avatarUrlAbsolute,
+                                fallbackGradient: avatarFrameColors(
+                                  currentUser.avatarFrameId,
+                                ),
+                                onNoStory: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => const EditProfileScreen(),
+                                    ),
+                                  );
+                                },
+                                child: Container(
+                                  padding: const EdgeInsets.all(3),
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: Theme.of(
+                                      context,
+                                    ).scaffoldBackgroundColor,
+                                  ),
+                                  child: CircleAvatar(
+                                    radius: 42,
+                                    backgroundColor: Colors.white10,
+                                    backgroundImage: avatarProvider,
+                                    child: avatarProvider == null
+                                        ? const Icon(
+                                            Icons.person,
+                                            color: Colors.white54,
+                                            size: 36,
+                                          )
+                                        : null,
+                                  ),
                                 ),
                               ),
-                            ),
-                            child: CircleAvatar(
-                              radius: 42,
-                              backgroundColor: Colors.white10,
-                              backgroundImage: avatarProvider,
-                              child: avatarProvider == null
-                                  ? const Icon(
-                                      Icons.person,
-                                      color: Colors.white54,
-                                      size: 36,
-                                    )
-                                  : null,
-                            ),
-                          ),
-                        ),
                       ),
                     ],
                   ),
@@ -784,14 +791,7 @@ class _PostsGridTab extends StatelessWidget {
                   errorBuilder: (_, __, ___) => const SizedBox.shrink(),
                 )
               : imageUrl != null
-              ? Image.network(
-                  imageUrl,
-                  fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => const Icon(
-                    Icons.broken_image_outlined,
-                    color: Colors.white24,
-                  ),
-                )
+              ? ZentryNetworkImage(imageUrl: imageUrl, fit: BoxFit.cover)
               : Padding(
                   padding: const EdgeInsets.all(6),
                   child: Text(
@@ -1002,17 +1002,47 @@ class _PortfolioTab extends StatelessWidget {
   }
 }
 
-class _CommunitiesTab extends StatelessWidget {
+class _CommunitiesTab extends StatefulWidget {
   final int? userId;
   final AppLocalizations l10n;
 
   const _CommunitiesTab({required this.userId, required this.l10n});
 
   @override
+  State<_CommunitiesTab> createState() => _CommunitiesTabState();
+}
+
+class _CommunitiesTabState extends State<_CommunitiesTab> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final controller = context.read<CommunityController>();
+      if (!controller.communitiesLoaded && !controller.communitiesLoading) {
+        controller.loadBackendCommunities();
+      }
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final communities = userId != null
-        ? context.watch<CommunityController>().myCommunities(userId!)
-        : const [];
+    final l10n = widget.l10n;
+    final controller = context.watch<CommunityController>();
+    // CORRECCIÓN: antes leía `myCommunities(userId)` (sistema local legado,
+    // vacío desde que las comunidades se integraron con el backend real —
+    // ver doc-comment de `CommunityController.backendMyCommunities`). Ahora
+    // filtra la misma lista real ya cargada por `isJoined`.
+    final communities = controller.backendMyCommunities;
+
+    if (controller.communitiesLoading && !controller.communitiesLoaded) {
+      return const Center(
+        child: Padding(
+          padding: EdgeInsets.only(top: 48),
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
 
     if (communities.isEmpty) {
       return Align(
@@ -1027,31 +1057,42 @@ class _CommunitiesTab extends StatelessWidget {
       );
     }
 
+    final currentUsername = context
+        .watch<AuthController>()
+        .currentUser
+        ?.username;
+
     return ListView.builder(
       padding: const EdgeInsets.all(14),
       itemCount: communities.length,
       itemBuilder: (context, index) {
         final c = communities[index];
+        // El backend no expone el rol (miembro/admin) por API — sólo se
+        // puede saber con certeza si el usuario es el CREADOR (`ownerUsername`).
+        final isOwner =
+            currentUsername != null &&
+            c.ownerUsername != null &&
+            c.ownerUsername!.toLowerCase() == currentUsername.toLowerCase();
         return ListTile(
-          leading: CircleAvatar(
-            backgroundColor: Colors.white10,
-            backgroundImage: c.iconPath != null
-                ? FileImage(File(c.iconPath!))
-                : null,
-            child: c.iconPath == null
-                ? const Icon(Icons.groups_rounded, color: Colors.white54)
-                : null,
+          leading: ZentryAvatar(
+            radius: 22,
+            networkUrl: c.avatarUrlAbsolute,
+            icon: Icons.groups_rounded,
           ),
-          title: Text(c.name, style: const TextStyle(color: Colors.white)),
+          title: Text(c.nombre, style: const TextStyle(color: Colors.white)),
           subtitle: Text(
-            c.categoryName,
+            <String>[
+              if ((c.categoria ?? '').isNotEmpty) c.categoria!,
+              if (isOwner) l10n.communitiesRoleOwner,
+              l10n.communitiesMembersCount(c.membersCount),
+            ].join(' · '),
             style: TextStyle(color: Colors.grey.shade500),
           ),
           onTap: () {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (_) => CommunityDetailScreen(communityId: c.id),
+                builder: (_) => CommunityDetailScreen(identifier: c.identifier),
               ),
             );
           },

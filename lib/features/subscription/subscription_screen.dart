@@ -80,17 +80,22 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
 
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
+            // NO existe proveedor de pagos real (Stripe/Google Play
+            // Billing/App Store) todavía — ver reporte de la fase.
+            // Deshabilitado a propósito: nunca simular una compra exitosa
+            // de $9.99/$24.99 reales (Fase 7 del reporte).
             child: ElevatedButton(
-              onPressed: () {},
+              onPressed: null,
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.purple,
+                disabledBackgroundColor: Colors.purple.withValues(alpha: .35),
                 minimumSize: const Size(double.infinity, 55),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(14),
                 ),
               ),
               child: Text(
-                l10n.subscriptionUpgradeButton,
+                l10n.subscriptionComingSoon,
                 style: const TextStyle(fontSize: 16),
               ),
             ),
@@ -170,7 +175,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
           boxShadow: (plan["popular"] as bool)
               ? [
                   BoxShadow(
-                    color: Colors.purple.withOpacity(0.4),
+                    color: Colors.purple.withValues(alpha: 0.4),
                     blurRadius: 25,
                   ),
                 ]
@@ -235,16 +240,21 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                 const SizedBox(height: 20),
 
                 ElevatedButton(
-                  onPressed: () {},
+                  // Ídem al CTA principal: sin proveedor de pagos real, este
+                  // botón nunca debe parecer accionable para un plan de pago.
+                  onPressed: null,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: (plan["active"] as bool)
                         ? Colors.grey
                         : Colors.black,
+                    disabledBackgroundColor: (plan["active"] as bool)
+                        ? Colors.grey
+                        : Colors.black45,
                   ),
                   child: Text(
                     (plan["active"] as bool)
                         ? l10n.subscriptionCurrentPlanButton
-                        : l10n.subscriptionSelectPlanButton,
+                        : l10n.subscriptionComingSoon,
                   ),
                 ),
 

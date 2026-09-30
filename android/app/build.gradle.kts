@@ -40,6 +40,15 @@ android {
     }
 }
 
+// Firebase/FCM (Fase 3-4 de la integración): el plugin de Google Services
+// necesita un google-services.json real (de un proyecto Firebase creado en
+// la consola) para poder aplicarse; sin él, `apply(plugin = ...)` falla el
+// build entero. Se aplica condicionalmente para que `flutter build` siga
+// funcionando mientras no exista ese archivo.
+if (file("google-services.json").exists()) {
+    apply(plugin = "com.google.gms.google-services")
+}
+
 flutter {
     source = "../.."
 }

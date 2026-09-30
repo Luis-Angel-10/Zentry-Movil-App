@@ -70,6 +70,21 @@ dependencies:
   dio: ^5.7.0
   flutter_secure_storage: ^9.2.4
 
+  # --- Caché de imágenes de red (feed, perfiles, búsqueda, guardados) ---
+  cached_network_image: ^3.4.1
+
+  # http_parser: ya era dependencia transitiva de dio; se declara directa
+  # para el MediaType usado al mandar la parte "data" (JSON) dentro del
+  # multipart de actualizar comunidad con avatar/banner.
+  http_parser: ^4.0.0
+
+  # --- Firebase Cloud Messaging (push notifications) ---
+  # NOTA: sin google-services.json/GoogleService-Info.plist reales,
+  # FcmService.init() falla de forma controlada y la app sigue funcionando
+  # normalmente sólo con WebSocket + notificaciones locales. Ver reporte.
+  firebase_core: ^3.8.0
+  firebase_messaging: ^15.1.5
+
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
  
@@ -103,20 +118,20 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   #
-  # NOTA (sesión de ícono/notificaciones): login.png, inicio.png e
-  # icono_inicio.png ya NO existen físicamente en assets/ (solo queda
-  # icon-app.png, la fuente del launcher icon). Listarlos aquí sin que
-  # existan en disco hace fallar la construcción del asset bundle
-  # ("No file or variants found for asset"), lo que rompía `flutter test` y
-  # `flutter build`. Se quitaron de esta lista ÚNICAMENTE para desbloquear
-  # esos comandos -no se generaron imágenes de reemplazo-. login_page.dart,
-  # register_page.dart y otras 5 pantallas siguen haciendo
-  # `Image.asset("assets/inicio.png"/"assets/login.png")`; sin el archivo
-  # real en disco esas pantallas mostrarán el icono de imagen rota en
-  # tiempo de ejecución hasta que restaures esos 3 archivos (con esos
-  # nombres, en assets/) o edites ese código — ver el reporte final.
+  # NOTA: login.png, inicio.png e icono_inicio.png nunca existieron
+  # físicamente en assets/ (sólo existe icon-app.png, la fuente del launcher
+  # icon). Las referencias rotas a esos 3 archivos (login_page.dart y datos
+  # mock de events/likes/saved/settings-notifications) ya se resolvieron:
+  # las pantallas de datos mock muestran un placeholder (Icon + gradiente/
+  # color) cuando no hay imagen real. No se deben reintroducir esos 3
+  # nombres sin agregar los archivos reales.
+  #
+  # Logo-Zentry.jpg (Fase 3B): logo real de marca usado en login_page.dart
+  # en vez de icon-app.png (el ícono del launcher, no pensado para verse
+  # grande dentro de una pantalla).
   assets:
     - assets/icon-app.png
+    - assets/Logo-Zentry.jpg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

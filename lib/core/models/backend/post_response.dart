@@ -61,6 +61,29 @@ class PostResponse {
   List<String> get mediaUrlsAbsolute =>
       mediaUrls.map(ApiConfig.resolveMediaUrl).toList();
 
+  /// Detección de video (corrección Fase 3B). LIMITACIÓN CONFIRMADA por
+  /// lectura del backend real (`PostService.java`): a diferencia de las
+  /// historias (donde el servidor SÍ detecta `VIDEO`/`IMAGE` a partir del
+  /// MIME real del archivo subido), en `Post` el campo `content_type` es
+  /// una columna de texto libre que el backend guarda TAL CUAL la mandó el
+  /// cliente — no hay validación ni detección de MIME del lado del
+  /// servidor, y `"video"` no es un valor que el backend conozca o
+  /// verifique de ninguna forma. Por eso la señal principal aquí sigue
+  /// siendo ese campo (es la única "metadata" que realmente viaja con el
+  /// post), pero como puede faltar en posts creados antes de esta
+  /// corrección o por otros flujos (p. ej. posts de comunidad), se agrega
+  /// un fallback por extensión de la URL — no ingenuo (`url.endsWith`
+  /// directo sobre la URL completa se rompe con query params/URLs
+  /// firmadas): se parsea la URI y sólo se mira su `path`, en minúsculas.
+  bool get isVideoContent {
+    if (contentType?.toLowerCase() == 'video') return true;
+    final url = imageUrlAbsolute;
+    if (url == null || url.isEmpty) return false;
+    final path = (Uri.tryParse(url)?.path ?? url).toLowerCase();
+    const videoExtensions = ['.mp4', '.mov', '.webm', '.mkv', '.avi', '.m4v'];
+    return videoExtensions.any((ext) => path.endsWith(ext));
+  }
+
   PostResponse copyWith({
     String? title,
     String? content,

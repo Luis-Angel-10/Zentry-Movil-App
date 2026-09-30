@@ -21,6 +21,10 @@ plugins {
     id("dev.flutter.flutter-plugin-loader") version "1.0.0"
     id("com.android.application") version "8.11.1" apply false
     id("org.jetbrains.kotlin.android") version "2.2.20" apply false
+    // Firebase/FCM (Fase 3-4): registrado aquí pero SÓLO se aplica en
+    // app/build.gradle.kts si existe un google-services.json real, para no
+    // romper el build de quien todavía no tiene un proyecto Firebase creado.
+    id("com.google.gms.google-services") version "4.4.2" apply false
 }
 
 include(":app")

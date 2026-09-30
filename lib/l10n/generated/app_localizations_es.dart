@@ -396,6 +396,12 @@ class AppLocalizationsEs extends AppLocalizations {
   String get homeAddStoryLabel => 'Tu historia';
 
   @override
+  String get homeStoriesLoading => 'Cargando…';
+
+  @override
+  String get homeStoriesRetry => 'Reintentar';
+
+  @override
   String get storyVisibilityPublic => 'Público';
 
   @override
@@ -426,6 +432,12 @@ class AppLocalizationsEs extends AppLocalizations {
   String storyReplyMessagePrefix(String text) {
     return 'Respondió a tu historia: $text';
   }
+
+  @override
+  String get chatRepliedToStory => 'Respondiste a su historia';
+
+  @override
+  String get chatRepliedToYourStory => 'Respondió a tu historia';
 
   @override
   String get storyDeleteConfirmTitle => 'Eliminar historia';
@@ -525,6 +537,21 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get communitiesJoinLabel => 'Unirse';
+
+  @override
+  String get communitiesRoleOwner => 'Creador';
+
+  @override
+  String communitiesMembersCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count miembros',
+      one: '1 miembro',
+      zero: 'Sin miembros',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get communitiesEmptyTitle => 'No se encontraron comunidades';
@@ -683,7 +710,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get communityDetailMembersTab => 'Miembros';
 
   @override
-  String get communityDetailRulesTitle => 'Reglas';
+  String get communityDetailRulesTitle => 'Reglas de la comunidad';
 
   @override
   String get communityDetailNoRules =>
@@ -1928,6 +1955,11 @@ class AppLocalizationsEs extends AppLocalizations {
       'Da like, comenta o publica para encenderla hoy';
 
   @override
+  String streakScreenPendingToday(int count) {
+    return 'Tu racha de $count días sigue viva. Actúa hoy para conservarla';
+  }
+
+  @override
   String get streakScreenWeekTitle => 'Actividad de la semana';
 
   @override
@@ -2922,6 +2954,322 @@ class AppLocalizationsEs extends AppLocalizations {
   String pdfDocStreakLabel(int days, int best) {
     return 'Racha actual: $days días (mejor racha: $best)';
   }
+
+  @override
+  String get authForgotPasswordTitle => '¿Olvidaste tu contraseña?';
+
+  @override
+  String get authForgotPasswordSubtitle =>
+      'Ingresa tu correo y te enviaremos un código para restablecer tu contraseña.';
+
+  @override
+  String get authForgotPasswordEmailHint => 'Correo electrónico';
+
+  @override
+  String get authForgotPasswordEmailInvalid => 'Ingresa un correo válido';
+
+  @override
+  String get authForgotPasswordSubmitButton => 'Enviar código';
+
+  @override
+  String get authForgotPasswordBackToLogin => 'Volver a iniciar sesión';
+
+  @override
+  String get authForgotPasswordUserNotFoundError =>
+      'No existe una cuenta con ese correo electrónico.';
+
+  @override
+  String get authForgotPasswordNetworkError =>
+      'Sin conexión con el servidor. Verifica tu red.';
+
+  @override
+  String get authForgotPasswordServerError =>
+      'Error del servidor. Inténtalo más tarde.';
+
+  @override
+  String get authForgotPasswordGenericError =>
+      'No se pudo enviar el código. Inténtalo de nuevo.';
+
+  @override
+  String get authForgotPasswordSuccessMessage =>
+      'Contraseña restablecida. Inicia sesión con tu nueva contraseña.';
+
+  @override
+  String get authResetPasswordTitle => 'Restablece tu contraseña';
+
+  @override
+  String authResetPasswordSubtitle(String email) {
+    return 'Escribe el código de 6 dígitos que enviamos a\n$email y elige tu nueva contraseña.';
+  }
+
+  @override
+  String get authResetPasswordCodeLengthError => 'El código tiene 6 dígitos';
+
+  @override
+  String get authResetPasswordNewPasswordHint => 'Nueva contraseña';
+
+  @override
+  String get authResetPasswordMinLengthError => 'Mínimo 6 caracteres';
+
+  @override
+  String get authResetPasswordConfirmHint => 'Confirmar contraseña';
+
+  @override
+  String get authResetPasswordMismatchError => 'Las contraseñas no coinciden';
+
+  @override
+  String get authResetPasswordSubmitButton => 'Restablecer contraseña';
+
+  @override
+  String authResetPasswordResendCooldown(int seconds) {
+    return 'Reenviar código en $seconds s';
+  }
+
+  @override
+  String get authResetPasswordResendButton => 'Reenviar código';
+
+  @override
+  String get authResetPasswordBackButton => 'Volver';
+
+  @override
+  String get authResetPasswordSuccessMessage =>
+      'Contraseña restablecida correctamente.';
+
+  @override
+  String get authResetPasswordResentMessage => 'Te enviamos un nuevo código.';
+
+  @override
+  String get authResetPasswordCodeInvalidError =>
+      'Código incorrecto. Revísalo e inténtalo de nuevo.';
+
+  @override
+  String get authResetPasswordCodeExpiredError =>
+      'El código expiró. Solicita uno nuevo.';
+
+  @override
+  String get authResetPasswordTooManyAttemptsError =>
+      'Demasiados intentos. Solicita un código nuevo.';
+
+  @override
+  String get authResetPasswordWeakPasswordError =>
+      'La contraseña debe tener al menos 6 caracteres.';
+
+  @override
+  String get authResetPasswordNoPendingCodeError =>
+      'No hay un código de recuperación pendiente. Solicita uno nuevo.';
+
+  @override
+  String get authResetPasswordNetworkError =>
+      'Sin conexión con el servidor. Verifica tu red.';
+
+  @override
+  String get authResetPasswordServerError =>
+      'Error del servidor. Inténtalo más tarde.';
+
+  @override
+  String get authResetPasswordGenericError =>
+      'No se pudo restablecer la contraseña.';
+
+  @override
+  String get authVerifyOtpTitle => 'Verifica tu correo';
+
+  @override
+  String authVerifyOtpSubtitle(String email) {
+    return 'Escribe el código de 6 dígitos que enviamos a\n$email';
+  }
+
+  @override
+  String get authVerifyOtpCodeLengthError => 'El código tiene 6 dígitos';
+
+  @override
+  String get authVerifyOtpSubmitButton => 'Verificar';
+
+  @override
+  String authVerifyOtpResendCooldown(int seconds) {
+    return 'Reenviar código en $seconds s';
+  }
+
+  @override
+  String get authVerifyOtpResendButton => 'Reenviar código';
+
+  @override
+  String get authVerifyOtpBackButton => 'Volver';
+
+  @override
+  String get authVerifyOtpInvalidError =>
+      'Código incorrecto. Revísalo e inténtalo de nuevo.';
+
+  @override
+  String get authVerifyOtpExpiredError =>
+      'El código expiró. Solicita uno nuevo.';
+
+  @override
+  String get authVerifyOtpTooManyAttemptsError =>
+      'Demasiados intentos. Solicita un código nuevo.';
+
+  @override
+  String get authVerifyOtpUserNotFoundError =>
+      'No encontramos una cuenta con ese correo.';
+
+  @override
+  String get authVerifyOtpNetworkError =>
+      'Sin conexión con el servidor. Verifica tu red.';
+
+  @override
+  String get authVerifyOtpServerError =>
+      'Error del servidor. Inténtalo más tarde.';
+
+  @override
+  String get authVerifyOtpGenericError => 'No se pudo verificar el código.';
+
+  @override
+  String get authVerifyOtpResentMessage => 'Te enviamos un nuevo código.';
+
+  @override
+  String get reactionLike => 'Me gusta';
+
+  @override
+  String get reactionLove => 'Me encanta';
+
+  @override
+  String get reactionHaha => 'Me divierte';
+
+  @override
+  String get reactionWow => 'Me sorprende';
+
+  @override
+  String get reactionFire => 'Increíble';
+
+  @override
+  String get reactionCreative => 'Creativo';
+
+  @override
+  String get backendFeedTimeAgoNow => 'Ahora';
+
+  @override
+  String backendFeedTimeAgoMinutes(int count) {
+    return 'Hace $count min';
+  }
+
+  @override
+  String backendFeedTimeAgoHours(int count) {
+    return 'Hace $count h';
+  }
+
+  @override
+  String backendFeedTimeAgoDays(int count) {
+    return 'Hace $count d';
+  }
+
+  @override
+  String get backendFeedDefaultUsername => 'usuario';
+
+  @override
+  String backendFeedPostedInCommunity(String community) {
+    return 'publicó en $community';
+  }
+
+  @override
+  String get backendFeedPostedInCommunityUnknown => 'publicó en una comunidad';
+
+  @override
+  String get backendFeedDeletePostTitle => 'Eliminar publicación';
+
+  @override
+  String get backendFeedPostDeletedMessage => 'Publicación eliminada';
+
+  @override
+  String get backendFeedCommentHint => 'Escribe un comentario…';
+
+  @override
+  String get backendFeedNoCommentsYet => 'Sé el primero en comentar';
+
+  @override
+  String get subscriptionComingSoon => 'Próximamente';
+
+  @override
+  String get walletScreenTitle => 'Zentry Coins';
+
+  @override
+  String get walletBalanceLabel => 'Saldo disponible';
+
+  @override
+  String get walletTransferButton => 'Transferir';
+
+  @override
+  String get walletTransactionsTitle => 'Movimientos';
+
+  @override
+  String get walletEmptyTransactions => 'Aún no tienes movimientos';
+
+  @override
+  String get walletErrorGeneric => 'No se pudo cargar tu billetera';
+
+  @override
+  String get walletTransferDialogTitle => 'Transferir Zentry Coins';
+
+  @override
+  String get walletTransferRecipientHint => 'Usuario destino';
+
+  @override
+  String get walletTransferAmountHint => 'Cantidad de ZC';
+
+  @override
+  String get walletTransferSubmitButton => 'Enviar';
+
+  @override
+  String get walletTransferSuccessMessage => 'Transferencia realizada';
+
+  @override
+  String get walletTransferAmountInvalid =>
+      'Ingresa una cantidad válida mayor a 0';
+
+  @override
+  String get walletTransferRecipientRequired => 'Ingresa el usuario destino';
+
+  @override
+  String walletMenuItem(String balance) {
+    return 'Zentry Coins: $balance';
+  }
+
+  @override
+  String get walletTxIngreso => 'Ingreso';
+
+  @override
+  String get walletTxEgreso => 'Egreso';
+
+  @override
+  String get walletTxRecarga => 'Recarga';
+
+  @override
+  String communityDetailCreatedByLabel(String username) {
+    return 'Creado por @$username';
+  }
+
+  @override
+  String get communityDetailNoPosts =>
+      'Aún no hay publicaciones en esta comunidad';
+
+  @override
+  String get communityDetailNewPostButton => 'Nueva publicación';
+
+  @override
+  String get communityDetailNewPostHint => '¿Qué quieres compartir?';
+
+  @override
+  String get communityDetailNewPostTitleRequired => 'Escribe un título';
+
+  @override
+  String get communityDetailPostPublishedSnackbar => 'Publicación creada';
+
+  @override
+  String get communityDetailErrorGeneric => 'No se pudo cargar la comunidad';
+
+  @override
+  String get communityDetailNotFound => 'Esta comunidad ya no existe';
+
+  @override
+  String get communityDetailAddImageButton => 'Agregar imagen';
 }
 
 /// The translations for Spanish Castilian, as used in Mexico (`es_MX`).
@@ -3316,6 +3664,12 @@ class AppLocalizationsEsMx extends AppLocalizationsEs {
   String get homeAddStoryLabel => 'Tu historia';
 
   @override
+  String get homeStoriesLoading => 'Cargando…';
+
+  @override
+  String get homeStoriesRetry => 'Reintentar';
+
+  @override
   String get storyVisibilityPublic => 'Público';
 
   @override
@@ -3346,6 +3700,12 @@ class AppLocalizationsEsMx extends AppLocalizationsEs {
   String storyReplyMessagePrefix(String text) {
     return 'Respondió a tu historia: $text';
   }
+
+  @override
+  String get chatRepliedToStory => 'Respondiste a su historia';
+
+  @override
+  String get chatRepliedToYourStory => 'Respondió a tu historia';
 
   @override
   String get storyDeleteConfirmTitle => 'Eliminar historia';
@@ -3445,6 +3805,21 @@ class AppLocalizationsEsMx extends AppLocalizationsEs {
 
   @override
   String get communitiesJoinLabel => 'Unirse';
+
+  @override
+  String get communitiesRoleOwner => 'Creador';
+
+  @override
+  String communitiesMembersCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count miembros',
+      one: '1 miembro',
+      zero: 'Sin miembros',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get communitiesEmptyTitle => 'No se encontraron comunidades';
@@ -3603,7 +3978,7 @@ class AppLocalizationsEsMx extends AppLocalizationsEs {
   String get communityDetailMembersTab => 'Miembros';
 
   @override
-  String get communityDetailRulesTitle => 'Reglas';
+  String get communityDetailRulesTitle => 'Reglas de la comunidad';
 
   @override
   String get communityDetailNoRules =>
@@ -4848,6 +5223,11 @@ class AppLocalizationsEsMx extends AppLocalizationsEs {
       'Da like, comenta o publica para encenderla hoy';
 
   @override
+  String streakScreenPendingToday(int count) {
+    return 'Tu racha de $count días sigue viva. Actúa hoy para conservarla';
+  }
+
+  @override
   String get streakScreenWeekTitle => 'Actividad de la semana';
 
   @override
@@ -5842,4 +6222,320 @@ class AppLocalizationsEsMx extends AppLocalizationsEs {
   String pdfDocStreakLabel(int days, int best) {
     return 'Racha actual: $days días (mejor racha: $best)';
   }
+
+  @override
+  String get authForgotPasswordTitle => '¿Olvidaste tu contraseña?';
+
+  @override
+  String get authForgotPasswordSubtitle =>
+      'Ingresa tu correo y te enviaremos un código para restablecer tu contraseña.';
+
+  @override
+  String get authForgotPasswordEmailHint => 'Correo electrónico';
+
+  @override
+  String get authForgotPasswordEmailInvalid => 'Ingresa un correo válido';
+
+  @override
+  String get authForgotPasswordSubmitButton => 'Enviar código';
+
+  @override
+  String get authForgotPasswordBackToLogin => 'Volver a iniciar sesión';
+
+  @override
+  String get authForgotPasswordUserNotFoundError =>
+      'No existe una cuenta con ese correo electrónico.';
+
+  @override
+  String get authForgotPasswordNetworkError =>
+      'Sin conexión con el servidor. Verifica tu red.';
+
+  @override
+  String get authForgotPasswordServerError =>
+      'Error del servidor. Inténtalo más tarde.';
+
+  @override
+  String get authForgotPasswordGenericError =>
+      'No se pudo enviar el código. Inténtalo de nuevo.';
+
+  @override
+  String get authForgotPasswordSuccessMessage =>
+      'Contraseña restablecida. Inicia sesión con tu nueva contraseña.';
+
+  @override
+  String get authResetPasswordTitle => 'Restablece tu contraseña';
+
+  @override
+  String authResetPasswordSubtitle(String email) {
+    return 'Escribe el código de 6 dígitos que enviamos a\n$email y elige tu nueva contraseña.';
+  }
+
+  @override
+  String get authResetPasswordCodeLengthError => 'El código tiene 6 dígitos';
+
+  @override
+  String get authResetPasswordNewPasswordHint => 'Nueva contraseña';
+
+  @override
+  String get authResetPasswordMinLengthError => 'Mínimo 6 caracteres';
+
+  @override
+  String get authResetPasswordConfirmHint => 'Confirmar contraseña';
+
+  @override
+  String get authResetPasswordMismatchError => 'Las contraseñas no coinciden';
+
+  @override
+  String get authResetPasswordSubmitButton => 'Restablecer contraseña';
+
+  @override
+  String authResetPasswordResendCooldown(int seconds) {
+    return 'Reenviar código en $seconds s';
+  }
+
+  @override
+  String get authResetPasswordResendButton => 'Reenviar código';
+
+  @override
+  String get authResetPasswordBackButton => 'Volver';
+
+  @override
+  String get authResetPasswordSuccessMessage =>
+      'Contraseña restablecida correctamente.';
+
+  @override
+  String get authResetPasswordResentMessage => 'Te enviamos un nuevo código.';
+
+  @override
+  String get authResetPasswordCodeInvalidError =>
+      'Código incorrecto. Revísalo e inténtalo de nuevo.';
+
+  @override
+  String get authResetPasswordCodeExpiredError =>
+      'El código expiró. Solicita uno nuevo.';
+
+  @override
+  String get authResetPasswordTooManyAttemptsError =>
+      'Demasiados intentos. Solicita un código nuevo.';
+
+  @override
+  String get authResetPasswordWeakPasswordError =>
+      'La contraseña debe tener al menos 6 caracteres.';
+
+  @override
+  String get authResetPasswordNoPendingCodeError =>
+      'No hay un código de recuperación pendiente. Solicita uno nuevo.';
+
+  @override
+  String get authResetPasswordNetworkError =>
+      'Sin conexión con el servidor. Verifica tu red.';
+
+  @override
+  String get authResetPasswordServerError =>
+      'Error del servidor. Inténtalo más tarde.';
+
+  @override
+  String get authResetPasswordGenericError =>
+      'No se pudo restablecer la contraseña.';
+
+  @override
+  String get authVerifyOtpTitle => 'Verifica tu correo';
+
+  @override
+  String authVerifyOtpSubtitle(String email) {
+    return 'Escribe el código de 6 dígitos que enviamos a\n$email';
+  }
+
+  @override
+  String get authVerifyOtpCodeLengthError => 'El código tiene 6 dígitos';
+
+  @override
+  String get authVerifyOtpSubmitButton => 'Verificar';
+
+  @override
+  String authVerifyOtpResendCooldown(int seconds) {
+    return 'Reenviar código en $seconds s';
+  }
+
+  @override
+  String get authVerifyOtpResendButton => 'Reenviar código';
+
+  @override
+  String get authVerifyOtpBackButton => 'Volver';
+
+  @override
+  String get authVerifyOtpInvalidError =>
+      'Código incorrecto. Revísalo e inténtalo de nuevo.';
+
+  @override
+  String get authVerifyOtpExpiredError =>
+      'El código expiró. Solicita uno nuevo.';
+
+  @override
+  String get authVerifyOtpTooManyAttemptsError =>
+      'Demasiados intentos. Solicita un código nuevo.';
+
+  @override
+  String get authVerifyOtpUserNotFoundError =>
+      'No encontramos una cuenta con ese correo.';
+
+  @override
+  String get authVerifyOtpNetworkError =>
+      'Sin conexión con el servidor. Verifica tu red.';
+
+  @override
+  String get authVerifyOtpServerError =>
+      'Error del servidor. Inténtalo más tarde.';
+
+  @override
+  String get authVerifyOtpGenericError => 'No se pudo verificar el código.';
+
+  @override
+  String get authVerifyOtpResentMessage => 'Te enviamos un nuevo código.';
+
+  @override
+  String get reactionLike => 'Me gusta';
+
+  @override
+  String get reactionLove => 'Me encanta';
+
+  @override
+  String get reactionHaha => 'Me divierte';
+
+  @override
+  String get reactionWow => 'Me sorprende';
+
+  @override
+  String get reactionFire => 'Increíble';
+
+  @override
+  String get reactionCreative => 'Creativo';
+
+  @override
+  String get backendFeedTimeAgoNow => 'Ahora';
+
+  @override
+  String backendFeedTimeAgoMinutes(int count) {
+    return 'Hace $count min';
+  }
+
+  @override
+  String backendFeedTimeAgoHours(int count) {
+    return 'Hace $count h';
+  }
+
+  @override
+  String backendFeedTimeAgoDays(int count) {
+    return 'Hace $count d';
+  }
+
+  @override
+  String get backendFeedDefaultUsername => 'usuario';
+
+  @override
+  String backendFeedPostedInCommunity(String community) {
+    return 'publicó en $community';
+  }
+
+  @override
+  String get backendFeedPostedInCommunityUnknown => 'publicó en una comunidad';
+
+  @override
+  String get backendFeedDeletePostTitle => 'Eliminar publicación';
+
+  @override
+  String get backendFeedPostDeletedMessage => 'Publicación eliminada';
+
+  @override
+  String get backendFeedCommentHint => 'Escribe un comentario…';
+
+  @override
+  String get backendFeedNoCommentsYet => 'Sé el primero en comentar';
+
+  @override
+  String get subscriptionComingSoon => 'Próximamente';
+
+  @override
+  String get walletScreenTitle => 'Zentry Coins';
+
+  @override
+  String get walletBalanceLabel => 'Saldo disponible';
+
+  @override
+  String get walletTransferButton => 'Transferir';
+
+  @override
+  String get walletTransactionsTitle => 'Movimientos';
+
+  @override
+  String get walletEmptyTransactions => 'Aún no tienes movimientos';
+
+  @override
+  String get walletErrorGeneric => 'No se pudo cargar tu billetera';
+
+  @override
+  String get walletTransferDialogTitle => 'Transferir Zentry Coins';
+
+  @override
+  String get walletTransferRecipientHint => 'Usuario destino';
+
+  @override
+  String get walletTransferAmountHint => 'Cantidad de ZC';
+
+  @override
+  String get walletTransferSubmitButton => 'Enviar';
+
+  @override
+  String get walletTransferSuccessMessage => 'Transferencia realizada';
+
+  @override
+  String get walletTransferAmountInvalid =>
+      'Ingresa una cantidad válida mayor a 0';
+
+  @override
+  String get walletTransferRecipientRequired => 'Ingresa el usuario destino';
+
+  @override
+  String walletMenuItem(String balance) {
+    return 'Zentry Coins: $balance';
+  }
+
+  @override
+  String get walletTxIngreso => 'Ingreso';
+
+  @override
+  String get walletTxEgreso => 'Egreso';
+
+  @override
+  String get walletTxRecarga => 'Recarga';
+
+  @override
+  String communityDetailCreatedByLabel(String username) {
+    return 'Creado por @$username';
+  }
+
+  @override
+  String get communityDetailNoPosts =>
+      'Aún no hay publicaciones en esta comunidad';
+
+  @override
+  String get communityDetailNewPostButton => 'Nueva publicación';
+
+  @override
+  String get communityDetailNewPostHint => '¿Qué quieres compartir?';
+
+  @override
+  String get communityDetailNewPostTitleRequired => 'Escribe un título';
+
+  @override
+  String get communityDetailPostPublishedSnackbar => 'Publicación creada';
+
+  @override
+  String get communityDetailErrorGeneric => 'No se pudo cargar la comunidad';
+
+  @override
+  String get communityDetailNotFound => 'Esta comunidad ya no existe';
+
+  @override
+  String get communityDetailAddImageButton => 'Agregar imagen';
 }

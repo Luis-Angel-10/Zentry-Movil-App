@@ -3,6 +3,20 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+/// Grafo de "follow" 100% LOCAL (SharedPreferences) — **NO es la fuente de
+/// verdad del follow real de Zentry**.
+///
+/// El follow real vive en el backend (`ProfileApi.toggleFollow`,
+/// `ProfileResponse.isFollowing/followersCount/followingCount`) y esa es la
+/// única fuente que debe consultarse para usuarios reales (perfil propio,
+/// perfil de otro usuario reconocido por el backend, estadísticas, etc.).
+///
+/// Este controller sigue existiendo únicamente para un dominio que SÍ es
+/// 100% local y no tiene equivalente en el backend: la visibilidad de las
+/// "historias" (`PostsController.groupedVisibleStories`, `stories_feed_data`
+/// en SharedPreferences) cuyo autor puede ser un usuario mock/local. Úsalo
+/// sólo para eso — si necesitas saber si alguien sigue a un usuario real del
+/// backend, consulta `ProfileResponse`, no este controller.
 class FollowController extends ChangeNotifier {
   static const _key = 'follows_data';
 

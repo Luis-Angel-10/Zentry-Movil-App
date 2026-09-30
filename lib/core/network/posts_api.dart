@@ -51,6 +51,26 @@ class PostsApi {
     );
   }
 
+  /// `GET /api/core/posts/liked/{username}` — publicaciones con like del
+  /// usuario dado. Respeta `Profile.showLikedPosts`: el backend responde
+  /// 403 si el dueño lo ocultó y quien consulta no es él mismo.
+  Future<List<PostResponse>> getLikedPosts(String username) {
+    return _c.guard(
+      () => _c.dio.get('/api/core/posts/liked/$username'),
+      (data) => _parseList(data),
+    );
+  }
+
+  /// `GET /api/core/posts/saved/{username}` — publicaciones guardadas del
+  /// usuario dado. Misma regla de privacidad que arriba
+  /// (`Profile.showSavedPosts`).
+  Future<List<PostResponse>> getSavedPosts(String username) {
+    return _c.guard(
+      () => _c.dio.get('/api/core/posts/saved/$username'),
+      (data) => _parseList(data),
+    );
+  }
+
   /// `GET /api/core/posts/by-user/{username}`.
   Future<List<PostResponse>> getPostsByUsername(String username) {
     return _c.guard(
@@ -107,7 +127,18 @@ class PostsApi {
       ),
     });
     return _c.guard(
-      () => _c.dio.post('/api/core/posts', data: form),
+      // Timeout extendido para esta subida: el campo `image` también recibe
+      // videos (ver `contentType: 'video'`) y los 20s globales de
+      // `ApiClient` alcanzan para una foto pero no para un archivo de video
+      // real.
+      () => _c.dio.post(
+        '/api/core/posts',
+        data: form,
+        options: Options(
+          sendTimeout: const Duration(seconds: 120),
+          receiveTimeout: const Duration(seconds: 60),
+        ),
+      ),
       (data) => PostResponse.fromJson(Map<String, dynamic>.from(data as Map)),
     );
   }
@@ -152,6 +183,78 @@ class PostsApi {
     return _c.guard(
       () => _c.dio.post('/api/core/posts/$id/bookmark'),
       (data) => data is Map && data['saved'] == true,
+    );
+  }
+
+  // ─── Posts de comunidad (mismo modelo, endpoint anidado) ───────────────
+  //
+  // `Post` tiene columna `communityId` real; el backend reutiliza el mismo
+  // `PostService`/`PostResponse` para posts de comunidad, sólo cambia el
+  // path. Por eso viven aquí (no en un "CommunitiesApi" separado): evita
+  // duplicar el sistema de posts, como ya pasa con `getFeed`/`createPost`.
+
+  /// `GET /api/core/communities/{identifier}/posts?page=&size=` — público.
+  Future<PagedResult<PostResponse>> getCommunityPosts(
+    String identifier, {
+    int page = 0,
+    int size = 20,
+  }) {
+    return _c.guard(
+      () => _c.dio.get(
+        '/api/core/communities/$identifier/posts',
+        queryParameters: {'page': page, 'size': size},
+      ),
+      (data) => _parsePaged(data),
+    );
+  }
+
+  /// `POST /api/core/communities/{identifier}/posts` — requiere JWT. Mismo
+  /// contrato de creación que [createPost], anidado bajo la comunidad.
+  Future<PostResponse> createCommunityPost(
+    String identifier, {
+    required String title,
+    String? content,
+    String? contentType,
+    String? visibility,
+    String? tools,
+    String? imagePath,
+  }) {
+    final path = '/api/core/communities/$identifier/posts';
+    if (imagePath == null || imagePath.isEmpty) {
+      final body = <String, dynamic>{'title': title};
+      if (content != null) body['contenido'] = content;
+      if (contentType != null) body['contentType'] = contentType;
+      if (visibility != null) body['visibility'] = visibility;
+      if (tools != null && tools.isNotEmpty) body['tools'] = tools;
+      return _c.guard(
+        () => _c.dio.post(path, data: body),
+        (data) => PostResponse.fromJson(Map<String, dynamic>.from(data as Map)),
+      );
+    }
+
+    final form = FormData.fromMap({
+      'title': title,
+      if (content != null) 'contenido': content,
+      if (contentType != null) 'contentType': contentType,
+      if (visibility != null) 'visibility': visibility,
+      if (tools != null && tools.isNotEmpty) 'tools': tools,
+      'image': MultipartFile.fromFileSync(
+        imagePath,
+        filename: imagePath.split(RegExp(r'[/\\]')).last,
+      ),
+    });
+    return _c.guard(
+      // Mismo timeout extendido que `createPost` — es el mismo endpoint de
+      // subida de media, sólo que anidado bajo comunidad.
+      () => _c.dio.post(
+        path,
+        data: form,
+        options: Options(
+          sendTimeout: const Duration(seconds: 120),
+          receiveTimeout: const Duration(seconds: 60),
+        ),
+      ),
+      (data) => PostResponse.fromJson(Map<String, dynamic>.from(data as Map)),
     );
   }
 
