@@ -9,9 +9,8 @@ import 'package:Zentry/core/config/api_config.dart';
 import 'package:Zentry/core/network/api_exception.dart';
 
 void main() {
-  test('ApiConfig.baseUrl no termina en slash y apunta al puerto 8080', () {
+  test('ApiConfig.baseUrl no termina en slash', () {
     expect(ApiConfig.baseUrl.endsWith('/'), isFalse);
-    expect(ApiConfig.baseUrl.contains('8080'), isTrue);
   });
 
   test(

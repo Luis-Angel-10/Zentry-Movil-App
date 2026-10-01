@@ -68,7 +68,8 @@ class RealtimeClient {
     if (token == null || token.isEmpty) return;
 
     _client = StompClient(
-      config: StompConfig(
+      // STOMP sobre SockJS: el endpoint `/ws` del backend es SockJS.
+      config: StompConfig.sockJS(
         url: ApiConfig.wsUrl,
         reconnectDelay: const Duration(seconds: 5),
         stompConnectHeaders: {'Authorization': 'Bearer $token'},

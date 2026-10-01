@@ -9,8 +9,12 @@
   afecta a builds de release, que siguen sin poder usar cleartext hacia
   ningún host.
 
-  Hosts habilitados (deben coincidir con los que resuelve ApiConfig en
-  lib/core/config/api_config.dart):
+  El default de la app (ApiConfig.defaultBaseUrl) es el backend desplegado
+  por HTTPS y NO depende de nada de este archivo. Estos hosts solo se usan
+  cuando se sobrescribe la URL con ZENTRY_API_BASE_URL (o adb reverse) para
+  apuntar a un backend local en HTTP.
+
+  Hosts habilitados:
     - 10.0.2.2      : Android Emulator (loopback del host)
     - 192.168.1.71  : laptop del backend en LAN, usada para pruebas en
                        dispositivo físico (Huawei MatePad 11.5S) vía el
