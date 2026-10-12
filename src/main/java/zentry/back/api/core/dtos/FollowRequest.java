@@ -1,0 +1,15 @@
+package zentry.back.api.core.dtos;
+
+import jakarta.validation.constraints.NotNull;
+import lombok.*;
+
+@Getter @Setter @Builder
+@AllArgsConstructor @NoArgsConstructor
+public class FollowRequest {
+
+    @NotNull
+    private Integer follower;
+
+    @NotNull
+    private Integer following;
+}

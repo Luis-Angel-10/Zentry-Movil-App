@@ -1,0 +1,10 @@
+package zentry.back.api.business.dtos;
+
+import lombok.*;
+
+@Getter @Setter @Builder
+@AllArgsConstructor @NoArgsConstructor
+public class PaymentMethodsRequest {
+    private Integer userId;
+    private String metodo;
+}

@@ -1,0 +1,56 @@
+HELP.md
+target/
+.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### VS Code ###
+.vscode/
+
+### Claude AI Agent ###
+
+.properties
+zentryweb.session.sql
+*.session.sql
+
+### Uploads (user-generated content, may contain PII in filenames) ###
+uploads/
+
+### Environment Variables ###
+.env
+.env.*
+!.env.example
+
+# Archivos que no deben publicarse
+target/
+uploads/
+.env
+.env.*
+!.env.example
+.vscode/
+.idea/

@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<!-- ===== PARENT: Spring Boot BOM para gestión centralizada de versiones ===== -->
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>3.5.13</version>
+		<relativePath /> <!-- lookup parent from repository -->
+	</parent>
+
+	<!-- ===== IDENTIFICACIÓN DEL PROYECTO ===== -->
+	<groupId>zentry.back</groupId>
+	<artifactId>api</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name />
+	<description />
+	<url />
+	<licenses>
+		<license />
+	</licenses>
+	<developers>
+		<developer />
+	</developers>
+	<scm>
+		<connection />
+		<developerConnection />
+		<tag />
+		<url />
+	</scm>
+
+	<!-- ===== PROPIEDADES GLOBALES ===== -->
+	<properties>
+		<!-- El JDK local y el Dockerfile usan Java 17 (LTS alineado con Spring Boot 3.5.x). -->
+		<java.version>17</java.version>
+	</properties>
+
+	<dependencies>
+
+		<!-- ===== SPRING BOOT CORE ===== -->
+		<!-- JPA: ORM con Hibernate para acceso a bases de datos relacionales -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-jpa</artifactId>
+		</dependency>
+		<!-- Security: autenticación, autorización y filtros de seguridad HTTP -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-security</artifactId>
+		</dependency>
+		<!-- Validation: validación de beans con anotaciones (JSR-380 / Jakarta) -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-validation</artifactId>
+		</dependency>
+		<!-- Web: servidor embebido Tomcat + Spring MVC para APIs REST -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+		<!-- WebSocket: comunicación bidireccional en tiempo real sobre STOMP/SockJS -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-websocket</artifactId>
+		</dependency>
+		<!-- Mail: envío real de correos (OTP de verificación) vía SMTP con JavaMailSender -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-mail</artifactId>
+		</dependency>
+
+		<!-- ===== DOCUMENTACIÓN API ===== -->
+		<!-- SpringDoc OpenAPI: genera UI de Swagger automáticamente desde los controladores -->
+		<dependency>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+			<version>2.8.16</version>
+		</dependency>
+
+		<!-- ===== BASE DE DATOS ===== -->
+		<!-- PostgreSQL: driver JDBC para la base de datos relacional (solo en runtime) -->
+		<dependency>
+			<groupId>org.postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+		<!-- H2: BD en memoria SOLO para tests (perfil "test"); dev/prod siguen en PostgreSQL -->
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- ===== UTILIDADES ===== -->
+		<!-- Lombok: reduce boilerplate con anotaciones (@Getter, @Builder, etc.) -->
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<optional>true</optional>
+		</dependency>
+
+		<!-- ===== TESTING ===== -->
+		<!-- Spring Boot Test: JUnit 5 + Mockito + contexto de Spring para pruebas -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<!-- Spring Security Test: utilidades para probar endpoints protegidos -->
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+
+		<!-- ===== JWT (JSON Web Token) ===== -->
+		<!-- API principal para interactuar con JWT -->
+		<dependency>
+			<groupId>io.jsonwebtoken</groupId>
+			<artifactId>jjwt-api</artifactId>
+			<version>0.12.5</version>
+		</dependency>
+		<!-- Implementación interna (solo necesaria en tiempo de ejecución) -->
+		<dependency>
+			<groupId>io.jsonwebtoken</groupId>
+			<artifactId>jjwt-impl</artifactId>
+			<version>0.12.5</version>
+			<scope>runtime</scope>
+		</dependency>
+		<!-- Integración con Jackson para serializar/deserializar JSON -->
+		<dependency>
+			<groupId>io.jsonwebtoken</groupId>
+			<artifactId>jjwt-jackson</artifactId>
+			<version>0.12.5</version>
+			<scope>runtime</scope>
+		</dependency>
+
+
+	</dependencies>
+
+	<build>
+		<plugins>
+
+			<!-- ===== SPRING BOOT MAVEN PLUGIN ===== -->
+			<!-- Empaqueta el proyecto como JAR ejecutable; excluye Lombok del artefacto final -->
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+					<excludes>
+						<!-- Lombok solo es necesario en compile-time, no en el JAR final -->
+						<exclude>
+							<groupId>org.projectlombok</groupId>
+							<artifactId>lombok</artifactId>
+						</exclude>
+					</excludes>
+				</configuration>
+			</plugin>
+
+			<!-- ===== MAVEN COMPILER PLUGIN ===== -->
+			<!-- Lombok como annotation processor para compile y test-compile.
+			     Una sola <configuration> aplica a las ejecuciones default-compile y
+			     default-testCompile. <proc>full</proc> es necesario porque en JDK 21+
+			     javac ya no ejecuta procesadores implícitos del classpath.
+			     La versión de Lombok la gestiona spring-boot-starter-parent. -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<proc>full</proc>
+					<annotationProcessorPaths>
+						<path>
+							<groupId>org.projectlombok</groupId>
+							<artifactId>lombok</artifactId>
+							<version>${lombok.version}</version>
+						</path>
+					</annotationProcessorPaths>
+				</configuration>
+			</plugin>
+
+		</plugins>
+	</build>
+
+</project>
